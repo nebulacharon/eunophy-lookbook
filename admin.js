@@ -99,12 +99,30 @@ function renderTable(data) {
       <td><strong>${item.title}</strong><br><small style="color:#64748b;">${slug}</small></td>
       <td>${item.category || '-'}</td>
       <td>
-        <button class="btn btn-copy" onclick="copyDirectLink('${origin}/p/${slug}')">📋 Copy Direct</button>
+        <button class="btn btn-copy" onclick="copyDirectLink('${origin}/p/${slug}')" style="display:inline-flex; align-items:center; gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Direct Link
+        </button>
       </td>
       <td>
         <div class="action-group">
-          <button class="btn btn-edit" onclick="openEditModal('${slug}')">✏️ Edit</button>
-          <button class="btn btn-danger" onclick="deleteProduct('${slug}')">🗑️ Hapus</button>
+          <button class="btn btn-edit" onclick="openEditModal('${slug}')" style="display:inline-flex; align-items:center; gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            Edit
+          </button>
+          <button class="btn btn-danger" onclick="deleteProduct('${slug}')" style="display:inline-flex; align-items:center; gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Hapus
+          </button>
         </div>
       </td>
     </tr>
