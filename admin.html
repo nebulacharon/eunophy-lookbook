@@ -3,72 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eunophy Admin Panel</title>
+  <title>EUNOPHY — Admin Dashboard</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #f8fafc; margin: 0; padding: 20px; color: #0f172a; }
-    .admin-box { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
-    h2 { margin-top: 0; margin-bottom: 16px; font-size: 17px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
-    input, select { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
-    .btn { padding: 9px 14px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .btn-dark { background: #0f172a; color: white; width: 100%; margin-top: 6px; }
-    .btn-copy { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 5px 9px; font-size: 11px; }
-    .btn-danger { background: #fee2e2; color: #b91c1c; padding: 5px 9px; font-size: 11px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-    th, td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; }
-    th { background: #f8fafc; color: #64748b; font-size: 11px; text-transform: uppercase; }
-    .thumb { width: 40px; height: 52px; object-fit: cover; border-radius: 3px; }
+    body { background: #f8fafc; margin: 0; padding: 24px 16px; color: #0f172a; }
+    .admin-container { max-width: 960px; margin: 0 auto; }
+    .card { background: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
+    h2 { margin: 0 0 16px 0; font-size: 18px; letter-spacing: 0.5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
+    
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #475569; }
+    input[type="text"], input[type="file"] { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13.5px; outline: none; }
+    input[type="file"] { padding: 8px; background: #f8fafc; font-size: 12px; }
+    input:focus { border-color: #0f172a; }
+    
+    .preview-box { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+    .preview-img { width: 50px; height: 66px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; background: #f1f5f9; display: none; }
+    
+    .btn { padding: 9px 14px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-dark { background: #0f172a; color: #ffffff; width: 100%; padding: 12px; font-size: 14px; margin-top: 6px; }
+    .btn-copy { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 11.5px; }
+    .btn-edit { background: #e0e7ff; color: #3730a3; padding: 6px 10px; font-size: 11.5px; }
+    .btn-danger { background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 11.5px; }
+    
+    /* Search Bar & Stats */
+    .table-header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+    .table-title { font-size: 15px; font-weight: 600; }
+    .search-admin { max-width: 260px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; outline: none; }
+    
+    /* Table Responsive */
+    .table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 600; }
+    .thumb { width: 44px; height: 58px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; }
+    .action-group { display: flex; gap: 6px; align-items: center; }
+
+    /* Modal Popup Edit */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: #ffffff; width: 100%; max-width: 520px; padding: 22px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
   </style>
 </head>
 <body>
 
-  <div class="admin-box">
-    <h2>EUNOPHY — Kelola Lookbook</h2>
+  <div class="admin-container">
+    
+    <!-- FORM TAMBAH PRODUK -->
+    <div class="card">
+      <h2>EUNOPHY — Tambah Koleksi Baru</h2>
 
-    <div class="form-group">
-      <label>Kode / Judul Produk (contoh: 6130.b atau Vintage Blazer)</label>
-      <input type="text" id="title" placeholder="6130.b">
+      <div class="form-group">
+        <label>Kode / ID Produk (misal: 6130.b atau Noir Blazer)</label>
+        <input type="text" id="title" placeholder="6130.b">
+      </div>
+
+      <div class="form-group">
+        <label>Kategori Bebas (misal: Dress & Set, Blazer, Celana, dll)</label>
+        <input type="text" id="category" placeholder="Ketik kategori...">
+      </div>
+
+      <div class="form-group">
+        <label>Upload Foto Produk (Otomatis HD & Kompresi Optimal)</label>
+        <input type="file" id="image_file" accept="image/*">
+        <div class="preview-box">
+          <img id="image_preview" class="preview-img" alt="Preview">
+          <small id="image_status" style="color: #64748b; font-size: 11px;"></small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Link Shopee Affiliate</label>
+        <input type="text" id="affiliate_url" placeholder="https://s.shopee.co.id/...">
+      </div>
+
+      <button class="btn btn-dark" id="btn-save" onclick="saveNewProduct()">Simpan Koleksi</button>
     </div>
 
-    <div class="form-group">
-      <label>Kategori</label>
-      <select id="category">
-        <option value="Atasan">Atasan / Tops</option>
-        <option value="Celana & Rok">Celana & Rok / Bottoms</option>
-        <option value="Dress & Set">Dress & Set</option>
-        <option value="Outer">Outer & Blazer</option>
-        <option value="Aksesoris">Aksesoris & Tas</option>
-      </select>
+    <!-- TABEL DATA PRODUK & PENCARIAN -->
+    <div class="card">
+      <div class="table-header-bar">
+        <div class="table-title">Daftar Koleksi (<span id="total-count">0</span>)</div>
+        <input type="text" id="search-table" class="search-admin" placeholder="🔍 Cari ID / Kategori...">
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Kode / ID</th>
+              <th>Kategori</th>
+              <th>Direct Link (Pinterest)</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr><td colspan="5" style="text-align: center; padding: 24px; color: #94a3b8;">Memuat data koleksi...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Path Foto (contoh: assets/images/6130.webp)</label>
-      <input type="text" id="image" placeholder="assets/images/...">
+  </div>
+
+  <!-- MODAL EDIT POPUP -->
+  <div id="edit-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 16px;">Edit Koleksi Produk</h3>
+        <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+
+      <input type="hidden" id="edit-old-slug">
+
+      <div class="form-group">
+        <label>Kode / ID Produk</label>
+        <input type="text" id="edit-title">
+      </div>
+
+      <div class="form-group">
+        <label>Kategori</label>
+        <input type="text" id="edit-category">
+      </div>
+
+      <div class="form-group">
+        <label>Ganti Foto (Kosongkan jika tidak ingin mengubah foto)</label>
+        <input type="file" id="edit-image-file" accept="image/*">
+        <div class="preview-box">
+          <img id="edit-preview-img" class="preview-img" style="display: block;" alt="Preview">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Link Shopee Affiliate</label>
+        <input type="text" id="edit-affiliate-url">
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 18px;">
+        <button class="btn btn-dark" style="flex: 1;" onclick="submitProductEdit()">Perbarui Produk</button>
+        <button class="btn" style="background: #e2e8f0; color: #334155;" onclick="closeEditModal()">Batal</button>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label>Link Shopee Affiliate</label>
-      <input type="text" id="affiliate_url" placeholder="https://s.shopee.co.id/...">
-    </div>
-
-    <button class="btn btn-dark" onclick="saveProduct()">Simpan Produk</button>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Foto</th>
-          <th>Kode</th>
-          <th>Kategori</th>
-          <th>Direct Link (Pinterest)</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="table-body">
-        <tr><td colspan="5" style="text-align: center;">Memuat data...</td></tr>
-      </tbody>
-    </table>
   </div>
 
   <script src="admin.js"></script>
