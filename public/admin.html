@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eunophy Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #f8fafc; margin: 0; padding: 20px; color: #0f172a; }
+    .admin-box { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    h2 { margin-top: 0; margin-bottom: 16px; font-size: 17px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+    input, select { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; }
+    .btn { padding: 9px 14px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-dark { background: #0f172a; color: white; width: 100%; margin-top: 6px; }
+    .btn-copy { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 5px 9px; font-size: 11px; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; padding: 5px 9px; font-size: 11px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th { background: #f8fafc; color: #64748b; font-size: 11px; text-transform: uppercase; }
+    .thumb { width: 40px; height: 52px; object-fit: cover; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <div class="admin-box">
+    <h2>EUNOPHY — Kelola Lookbook</h2>
+
+    <div class="form-group">
+      <label>Kode / Judul Produk (contoh: 6130.b atau Vintage Blazer)</label>
+      <input type="text" id="title" placeholder="6130.b">
+    </div>
+
+    <div class="form-group">
+      <label>Kategori</label>
+      <select id="category">
+        <option value="Atasan">Atasan / Tops</option>
+        <option value="Celana & Rok">Celana & Rok / Bottoms</option>
+        <option value="Dress & Set">Dress & Set</option>
+        <option value="Outer">Outer & Blazer</option>
+        <option value="Aksesoris">Aksesoris & Tas</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Path Foto (contoh: assets/images/6130.webp)</label>
+      <input type="text" id="image" placeholder="assets/images/...">
+    </div>
+
+    <div class="form-group">
+      <label>Link Shopee Affiliate</label>
+      <input type="text" id="affiliate_url" placeholder="https://s.shopee.co.id/...">
+    </div>
+
+    <button class="btn btn-dark" onclick="saveProduct()">Simpan Produk</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Foto</th>
+          <th>Kode</th>
+          <th>Kategori</th>
+          <th>Direct Link (Pinterest)</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="5" style="text-align: center;">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+name = "eunophy"
+main = "src/index.js"
+compatibility_date = "2024-04-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Buat KV namespace di Cloudflare Dashboard atau via CLI:
+# npx wrangler kv:namespace create "EUNOPHY_KV"
+# Lalu paste ID-nya di bawah ini:
+[[kv_namespaces]]
+binding = "EUNOPHY_KV"
+id = "253f0a6fc4c44e99b2732087805d22c8"
+
+[vars]
+ADMIN_TOKEN = "adminKatalog2026!"
