@@ -76,59 +76,48 @@ header {
 
 
 /* ==========================================================================
-   HERO EDITORIAL SECTION
+   HERO EDITORIAL SECTION (REVISED)
    ========================================================================== */
 
    .hero-section {
     position: relative;
     width: 100%;
     height: 440px;
-    background-color: #faf9f8; /* Soft warm off-white */
+    background-color: #faf9f8;
     overflow: hidden;
     display: flex;
     align-items: center;
-    margin-bottom: 28px;
-    border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+    margin-bottom: 40px;
   }
   
-  /* Gambar 1: Hero Background Illustration (Subtle & Tenang) */
+  /* Gambar 1: Background Halus (Full Cover Kanan + Masking Gradasi Kiri) */
   .hero-bg-art {
     position: absolute;
+    top: 0;
     right: 0;
-    bottom: 0;
-    width: min(1000px, 75vw);
+    width: 70%;
     height: 100%;
     object-fit: cover;
     object-position: right center;
-    opacity: 0;
+    opacity: 0.14;
     pointer-events: none;
     z-index: 0;
-    animation: heroFadeIn 1.6s ease-out forwards;
-  }
-  
-  @keyframes heroFadeIn {
-    from { opacity: 0; }
-    to { opacity: 0.16; }
+    /* Masking gradasi agar sisi kiri memudar mulus tanpa garis potong */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 40%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,1) 40%);
   }
   
   /* Typography Hero */
   .hero-content {
     position: relative;
     z-index: 2;
-    max-width: 540px;
-    margin-left: 7%;
+    max-width: 480px;
+    margin-left: 8%;
     pointer-events: none;
-    opacity: 0;
-    animation: textFadeIn 0.9s ease-out 0.25s forwards;
-  }
-  
-  @keyframes textFadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
   }
   
   .hero-title {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-size: 38px;
     font-weight: 300;
     line-height: 1.25;
@@ -136,13 +125,14 @@ header {
     letter-spacing: -0.2px;
   }
   
-  /* Gambar 2: Floating Fashion Illustration (Subtle Breathing Animation) */
+  /* Gambar 2: Floating Fashion Illustration */
   .hero-floating-art {
     position: absolute;
     right: 6%;
-    bottom: -30px;
-    width: 330px;
-    max-height: 460px;
+    bottom: -35px;
+    height: 95%; /* Mengikuti tinggi hero */
+    max-height: 420px;
+    width: auto;
     object-fit: contain;
     pointer-events: none;
     z-index: 1;
@@ -154,63 +144,51 @@ header {
       transform: translateY(0) rotate(0deg);
     }
     50% {
-      transform: translateY(-7px) rotate(0.4deg);
+      transform: translateY(-8px) rotate(0.4deg);
     }
     100% {
       transform: translateY(0) rotate(0deg);
     }
   }
   
-  /* Accessibility: User with Reduced Motion Preferences */
+  /* Accessibility */
   @media (prefers-reduced-motion: reduce) {
-    .hero-floating-art,
-    .hero-bg-art,
-    .hero-content {
+    .hero-floating-art {
       animation: none;
-      opacity: 1;
-    }
-    .hero-bg-art {
-      opacity: 0.16;
     }
   }
   
   /* ==========================================================================
-     RESPONSIVE / MOBILE ENHANCEMENT
+     RESPONSIVE / MOBILE
      ========================================================================== */
   
   @media (max-width: 768px) {
     .hero-section {
-      height: 350px;
-      margin-bottom: 20px;
+      height: 340px;
+      margin-bottom: 24px;
     }
   
     .hero-content {
       margin-left: 20px;
-      max-width: 290px;
+      max-width: 260px;
     }
   
     .hero-title {
-      font-size: 28px;
+      font-size: 26px;
       line-height: 1.2;
     }
   
     .hero-bg-art {
-      width: 620px;
-      right: -160px;
-      opacity: 0;
-      animation: heroFadeInMobile 1.6s ease-out forwards;
-    }
-  
-    @keyframes heroFadeInMobile {
-      from { opacity: 0; }
-      to { opacity: 0.10; }
+      width: 100%;
+      opacity: 0.10;
     }
   
     .hero-floating-art {
-      width: 210px;
-      right: -15px;
+      right: -10px;
       bottom: -20px;
-      opacity: 0.85;
+      height: 85%;
+      max-height: 300px;
+      opacity: 0.9;
     }
   }
 
