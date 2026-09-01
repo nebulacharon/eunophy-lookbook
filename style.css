@@ -74,6 +74,146 @@ header {
   font-size: 13px;
 }
 
+
+/* ==========================================================================
+   HERO EDITORIAL SECTION
+   ========================================================================== */
+
+   .hero-section {
+    position: relative;
+    width: 100%;
+    height: 440px;
+    background-color: #faf9f8; /* Soft warm off-white */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    margin-bottom: 28px;
+    border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+  }
+  
+  /* Gambar 1: Hero Background Illustration (Subtle & Tenang) */
+  .hero-bg-art {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: min(1000px, 75vw);
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    animation: heroFadeIn 1.6s ease-out forwards;
+  }
+  
+  @keyframes heroFadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.16; }
+  }
+  
+  /* Typography Hero */
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 540px;
+    margin-left: 7%;
+    pointer-events: none;
+    opacity: 0;
+    animation: textFadeIn 0.9s ease-out 0.25s forwards;
+  }
+  
+  @keyframes textFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    line-height: 1.25;
+    color: #1a1a1a;
+    letter-spacing: -0.2px;
+  }
+  
+  /* Gambar 2: Floating Fashion Illustration (Subtle Breathing Animation) */
+  .hero-floating-art {
+    position: absolute;
+    right: 6%;
+    bottom: -30px;
+    width: 330px;
+    max-height: 460px;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 1;
+    animation: subtleBreathe 6s ease-in-out infinite;
+  }
+  
+  @keyframes subtleBreathe {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-7px) rotate(0.4deg);
+    }
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+  }
+  
+  /* Accessibility: User with Reduced Motion Preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-floating-art,
+    .hero-bg-art,
+    .hero-content {
+      animation: none;
+      opacity: 1;
+    }
+    .hero-bg-art {
+      opacity: 0.16;
+    }
+  }
+  
+  /* ==========================================================================
+     RESPONSIVE / MOBILE ENHANCEMENT
+     ========================================================================== */
+  
+  @media (max-width: 768px) {
+    .hero-section {
+      height: 350px;
+      margin-bottom: 20px;
+    }
+  
+    .hero-content {
+      margin-left: 20px;
+      max-width: 290px;
+    }
+  
+    .hero-title {
+      font-size: 28px;
+      line-height: 1.2;
+    }
+  
+    .hero-bg-art {
+      width: 620px;
+      right: -160px;
+      opacity: 0;
+      animation: heroFadeInMobile 1.6s ease-out forwards;
+    }
+  
+    @keyframes heroFadeInMobile {
+      from { opacity: 0; }
+      to { opacity: 0.10; }
+    }
+  
+    .hero-floating-art {
+      width: 210px;
+      right: -15px;
+      bottom: -20px;
+      opacity: 0.85;
+    }
+  }
+
 /* Grid Lookbook: 2 Kolom di HP, 4 Kolom di Laptop/Desktop */
 .lookbook-grid {
   display: grid;
