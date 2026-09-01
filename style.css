@@ -27,37 +27,37 @@ body {
 
 /* Header & Search Bar */
 header {
-  max-width: 1200px;
+  max-width: 1040px; /* Dipersempit agar lebih compact & editorial */
   margin: 0 auto;
-  padding: 20px 16px 14px 16px;
+  padding: 18px 16px 14px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 12px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .brand-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
-  letter-spacing: 2.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
 .search-box {
   position: relative;
   width: 100%;
-  max-width: 260px;
+  max-width: 240px;
 }
 
 .search-input {
   width: 100%;
-  padding: 9px 12px 9px 34px;
+  padding: 8px 12px 8px 32px;
   background: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 12.5px;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -68,7 +68,7 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 10px;
+  left: 9px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
@@ -77,109 +77,73 @@ header {
 }
 
 /* ==========================================================================
-   HERO EDITORIAL SECTION (CLEAN SINGLE ART)
+   HERO EDITORIAL SECTION (COMPACT & CENTERED)
    ========================================================================== */
 
-   .hero-section {
-    position: relative;
-    width: 100%;
-    height: 420px;
-    background-color: #faf9f8;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    margin-bottom: 36px;
-    border-bottom: 1px solid rgba(229, 229, 229, 0.6);
-  }
-  
-  /* Typography Hero */
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 520px;
-    margin-left: max(6%, calc((100vw - 1200px) / 2 + 20px));
-    pointer-events: none;
-  }
-  
-  .hero-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 42px;
-    font-weight: 300;
-    line-height: 1.22;
-    color: #1a1a1a;
-    letter-spacing: -0.3px;
-  }
-  
-  /* Floating Fashion Illustration (Desktop & Default) */
-  .hero-floating-art {
-    position: absolute;
-    right: max(6%, calc((100vw - 1200px) / 2 + 10px));
-    bottom: -20px;
-    height: 94%;
-    max-height: 410px;
-    width: auto;
-    object-fit: contain;
-    pointer-events: none;
-    z-index: 1;
-    /* Animasi Floating Halus */
-    animation: subtleBreathe 6s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-  
-  @keyframes subtleBreathe {
-    0% {
-      transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-9px) rotate(0.4deg);
-    }
-    100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-  }
-  
-  /* ==========================================================================
-     RESPONSIVE / MOBILE
-     ========================================================================== */
-  
-  @media (max-width: 768px) {
-    .hero-section {
-      height: 330px;
-      margin-bottom: 24px;
-    }
-  
-    .hero-content {
-      margin-left: 18px;
-      max-width: 250px;
-    }
-  
-    .hero-title {
-      font-size: 28px;
-      line-height: 1.2;
-    }
-  
-    .hero-floating-art {
-      right: -10px;
-      bottom: -15px;
-      height: 88%;
-      max-height: 290px;
-      animation: subtleBreatheMobile 5s ease-in-out infinite alternate;
-    }
-  
-    @keyframes subtleBreatheMobile {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-7px); }
-    }
-  }
+.hero-section {
+  width: 100%;
+  background-color: #faf9f8;
+  border-bottom: 1px solid rgba(229, 229, 229, 0.6);
+  margin-bottom: 30px;
+}
+
+/* Wadah Hero dikunci lebarnya agar tidak renggang di layar lebar */
+.hero-wrapper {
+  max-width: 1040px;
+  height: 380px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+}
+
+/* Typography Hero */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 440px;
+  pointer-events: none;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1.25;
+  color: #1a1a1a;
+  letter-spacing: -0.2px;
+}
+
+/* Floating Art: Kaki utuh tidak terpotong */
+.hero-floating-art {
+  position: absolute;
+  right: 28px;
+  bottom: 14px; /* Diberi jarak agar sepatu utuh */
+  height: 88%;
+  max-height: 340px;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+  animation: subtleBreathe 6s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes subtleBreathe {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-7px) rotate(0.4deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
 
 /* ==========================================================================
-   PRODUCT GRID & CONTAINER
+   PRODUCT GRID & CARDS (LEBIH PADAT & RAPI)
    ========================================================================== */
 
 main {
-  max-width: 1200px;
+  max-width: 1040px; /* Mengunci lebar agar pas dengan hero */
   margin: 0 auto;
-  padding: 0 16px 40px 16px;
+  padding: 0 16px 48px 16px;
 }
 
 .lookbook-grid {
@@ -190,8 +154,15 @@ main {
 
 @media (min-width: 768px) {
   .lookbook-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
+    grid-template-columns: repeat(3, 1fr); /* 3 kolom di tablet */
+    gap: 16px;
+  }
+}
+
+@media (min-width: 992px) {
+  .lookbook-grid {
+    grid-template-columns: repeat(4, 1fr); /* 4 kolom di desktop agar padat */
+    gap: 16px;
   }
 }
 
@@ -201,16 +172,22 @@ main {
   color: inherit;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 2px;
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lookbook-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.04);
 }
 
 .img-container {
   position: relative;
   width: 100%;
-  padding-top: 133.33%;
-  background: #f1f1f1;
+  padding-top: 133.33%; /* Rasio 3:4 */
+  background: #f4f4f4;
   overflow: hidden;
 }
 
@@ -236,11 +213,11 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 16px 14px;
+  padding: 14px 12px;
   color: #ffffff;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.25s ease;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
 }
 
 .lookbook-card:hover .overlay-info,
@@ -250,11 +227,10 @@ main {
 }
 
 .overlay-code {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.5px;
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .overlay-action {
@@ -262,11 +238,9 @@ main {
   font-weight: 500;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   margin-top: 4px;
   color: #f1f5f9;
-  letter-spacing: 0.2px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .overlay-action svg {
@@ -274,7 +248,7 @@ main {
 }
 
 .card-bottom {
-  padding: 9px 10px;
+  padding: 8px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -283,49 +257,39 @@ main {
 }
 
 .product-code {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--text-main);
-  letter-spacing: 0.5px;
 }
 
 .category-tag {
-  font-size: 10.5px;
+  font-size: 10px;
   color: var(--text-muted);
 }
 
 /* ==========================================================================
-   RESPONSIVE MOBILE
+   RESPONSIVE / MOBILE
    ========================================================================== */
 
 @media (max-width: 768px) {
-  .hero-section {
-    height: 340px;
-    margin-bottom: 24px;
+  .hero-wrapper {
+    height: 290px; /* Tinggi lebih seimbang di layar HP */
+    padding: 0 16px;
   }
 
   .hero-content {
-    margin-left: 16px;
-    max-width: 250px;
+    max-width: 200px;
   }
 
   .hero-title {
-    font-size: 28px;
-    line-height: 1.2;
-  }
-
-  .hero-bg-art {
-    width: 100%;
-    min-width: 450px;
-    right: -100px;
-    opacity: 0.10;
+    font-size: 24px;
+    line-height: 1.22;
   }
 
   .hero-floating-art {
-    right: -15px;
-    bottom: -20px;
-    height: 85%;
-    max-height: 300px;
-    opacity: 0.9;
+    right: 12px;
+    bottom: 12px;
+    height: 82%;
+    max-height: 240px; /* Ukuran lebih proporsional di HP */
   }
 }
