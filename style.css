@@ -80,23 +80,58 @@ header {
    HERO EDITORIAL SECTION (COMPACT & CENTERED)
    ========================================================================== */
 
-.hero-section {
-  width: 100%;
-  background-color: #faf9f8;
-  border-bottom: 1px solid rgba(229, 229, 229, 0.6);
-  margin-bottom: 30px;
-}
+/* ==========================================================================
+   HERO EDITORIAL SECTION (SMOOTH ACCORDION COLLAPSE)
+   ========================================================================== */
 
-/* Wadah Hero dikunci lebarnya agar tidak renggang di layar lebar */
-.hero-wrapper {
-  max-width: 1040px;
-  height: 380px;
-  margin: 0 auto;
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-}
+   .hero-section {
+    width: 100%;
+    background-color: #faf9f8;
+    border-bottom: 1px solid rgba(229, 229, 229, 0.6);
+    margin-bottom: 30px;
+    
+    /* Gunakan display grid untuk transisi tinggi paling halus di CSS */
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: 
+      grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      margin-bottom 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.4s ease;
+    overflow: hidden;
+  }
+  
+  .hero-wrapper {
+    min-height: 0; /* Wajib untuk animasi grid row */
+    max-width: 1040px;
+    height: 380px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    width: 100%;
+    
+    /* Transisi isi konten & ilustrasi */
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: 
+      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+  
+  /* State saat kolom Search diketik (Smooth Collapse) */
+  .hero-section.hidden-search {
+    grid-template-rows: 0fr; /* Menyusut secara natural dari 380px ke 0px */
+    margin-bottom: 12px;
+    border-color: transparent;
+  }
+  
+  .hero-section.hidden-search .hero-wrapper {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.98); /* Efek melayang naik tipis sebelum hilang */
+    pointer-events: none;
+  }
 
 /* Typography Hero */
 .hero-content {

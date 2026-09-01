@@ -44,11 +44,24 @@ function renderCards(data) {
   `).join('');
 }
 
-// Search Filter Realtime
-document.getElementById('search-input').addEventListener('input', (e) => {
-  const query = e.target.value.toLowerCase().trim();
-  const filtered = {};
+// Search Filter Realtime + Smooth Auto-Collapse Hero
+const searchInput = document.getElementById('search-input');
+const hero = document.querySelector('.hero-section');
 
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+
+  // Animasi hero: menyusut jika ada teks pencarian, muncul lagi jika kosong
+  if (hero) {
+    if (query.length > 0) {
+      hero.classList.add('hidden-search');
+    } else {
+      hero.classList.remove('hidden-search');
+    }
+  }
+
+  // Logika filter bawaan (tidak diubah sama sekali)
+  const filtered = {};
   Object.entries(catalogData).forEach(([slug, item]) => {
     const matchTitle = (item.title || '').toLowerCase().includes(query);
     const matchCat = (item.category || '').toLowerCase().includes(query);
