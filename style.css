@@ -340,136 +340,185 @@ main {
   }
 }
 
-
 /* ==========================================================================
-   FLOATING PETALS / BOTANICAL PARTICLES (DELICATE & AIRY)
+   HERO FLOATING ART (LAYER KUNCI: Z-INDEX 2)
    ========================================================================== */
 
-   .petals-container {
+   .hero-floating-art {
+    position: absolute;
+    right: 28px;
+    bottom: 14px;
+    height: 88%;
+    max-height: 340px;
+    width: auto;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 2; /* Berada tepat di tengah antara layer-back dan layer-front */
+    animation: subtleBreathe 6s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  
+  /* ==========================================================================
+     PETALS / PARTICLES WITH 3D DEPTH
+     ========================================================================== */
+  
+  .petals-container {
     position: absolute;
     inset: 0;
     pointer-events: none;
     overflow: hidden;
   }
   
-  /* Layer Belakang: Samar & Micro size */
+  /* Layer Belakang (Z-Index 1): Lebih samar, sedikit blur, di belakang tubuh */
   .layer-back {
-    z-index: 0;
-    opacity: 0.45;
+    z-index: 1;
+    opacity: 0.55;
+    filter: blur(0.8px);
   }
   
-  /* Layer Depan: Sedikit lebih tegas */
+  /* Layer Depan (Z-Index 5): Tajam, kontras, melintas di DEPAN karakter */
   .layer-front {
-    z-index: 3;
-    opacity: 0.75;
+    z-index: 5;
+    opacity: 0.85;
   }
   
-  /* Bentuk Kelopak Bunga Halus (Lavender & Soft Mauve) */
+  /* Bentuk Dasar Kelopak */
   .petal {
     position: absolute;
-    background: linear-gradient(135deg, #d3c5e5 0%, #b8a9c9 100%);
+    background: linear-gradient(135deg, #cbb4db 0%, #b39ddb 50%, #dfccf1 100%);
     border-radius: 60% 0 60% 60%;
     pointer-events: none;
     will-change: transform, opacity;
   }
   
-  /* Animasi Melayang Miring Halus */
+  /* Animasi Meluncur Diagonal dari Kanan Atas ke Kiri Bawah */
   @keyframes floatDiagonal {
     0% {
       transform: translate3d(0, 0, 0) rotate(0deg);
       opacity: 0;
     }
     15% {
-      opacity: 0.8;
+      opacity: 0.9;
     }
     85% {
-      opacity: 0.8;
+      opacity: 0.9;
     }
     100% {
-      transform: translate3d(-240px, 380px, 0) rotate(180deg);
+      transform: translate3d(-260px, 400px, 0) rotate(240deg);
       opacity: 0;
     }
   }
   
-  /* --- Layer Belakang (Kecil 4px – 6px) --- */
-  .petal.p1 {
+  /* -------------------------------------------------------------
+     LAYER BELAKANG (Fokus padat di area belakang ilustrasi & tengah)
+     ------------------------------------------------------------- */
+  .petal.p-back-1 {
     top: -15px;
-    right: 12%;
-    width: 4px;
+    right: 6%; /* Dekat kepala ilustrasi dari belakang */
+    width: 4.5px;
     height: 7px;
-    animation: floatDiagonal 12s linear infinite;
+    animation: floatDiagonal 11s linear infinite;
     animation-delay: 0s;
   }
   
-  .petal.p2 {
+  .petal.p-back-2 {
     top: -15px;
-    right: 32%;
+    right: 14%; /* Tepat di belakang bahu ilustrasi */
     width: 5px;
     height: 8px;
-    animation: floatDiagonal 14s linear infinite;
-    animation-delay: 3s;
-  }
-  
-  .petal.p3 {
-    top: -15px;
-    right: 52%;
-    width: 4px;
-    height: 6px;
     animation: floatDiagonal 13s linear infinite;
-    animation-delay: 6s;
+    animation-delay: 3.5s;
   }
   
-  .petal.p4 {
+  .petal.p-back-3 {
     top: -15px;
-    right: 72%;
-    width: 5px;
-    height: 7px;
-    animation: floatDiagonal 15s linear infinite;
-    animation-delay: 2s;
-  }
-  
-  .petal.p5 {
-    top: -15px;
-    right: 90%;
+    right: 22%; /* Sisi kiri ilustrasi */
     width: 4px;
     height: 6px;
-    animation: floatDiagonal 11s linear infinite;
-    animation-delay: 8s;
+    animation: floatDiagonal 12s linear infinite;
+    animation-delay: 6.5s;
   }
   
-  /* --- Layer Depan (Ukuran 6px – 8px) --- */
-  .petal.p6 {
-    top: -20px;
-    right: 20%;
-    width: 6px;
-    height: 10px;
-    animation: floatDiagonal 9s linear infinite;
+  .petal.p-back-4 {
+    top: -15px;
+    right: 32%;
+    width: 5.5px;
+    height: 8.5px;
+    animation: floatDiagonal 14s linear infinite;
     animation-delay: 1.5s;
   }
   
-  .petal.p7 {
-    top: -20px;
-    right: 44%;
-    width: 7px;
-    height: 11px;
-    animation: floatDiagonal 10s linear infinite;
+  .petal.p-back-5 {
+    top: -15px;
+    right: 55%;
+    width: 4px;
+    height: 6px;
+    animation: floatDiagonal 13.5s linear infinite;
+    animation-delay: 8s;
+  }
+  
+  .petal.p-back-6 {
+    top: -15px;
+    right: 78%;
+    width: 5px;
+    height: 7.5px;
+    animation: floatDiagonal 15s linear infinite;
     animation-delay: 4.5s;
   }
   
-  .petal.p8 {
+  /* -------------------------------------------------------------
+     LAYER DEPAN (Melintas langsung di depan wajah, baju, & gaun)
+     ------------------------------------------------------------- */
+  .petal.p-front-1 {
     top: -20px;
-    right: 64%;
-    width: 6px;
-    height: 9px;
-    animation: floatDiagonal 9.5s linear infinite;
-    animation-delay: 7s;
+    right: 4%; /* Jatuh melintas di depan sisi kanan gaun */
+    width: 6.5px;
+    height: 10.5px;
+    animation: floatDiagonal 8.5s linear infinite;
+    animation-delay: 1s;
   }
   
-  .petal.p9 {
+  .petal.p-front-2 {
     top: -20px;
-    right: 84%;
+    right: 11%; /* Jatuh melintas langsung di depan dada & tas */
+    width: 7.5px;
+    height: 12px;
+    animation: floatDiagonal 9.2s linear infinite;
+    animation-delay: 4s;
+  }
+  
+  .petal.p-front-3 {
+    top: -20px;
+    right: 18%; /* Melintas di depan rambut & sisi kiri baju */
+    width: 6px;
+    height: 9.5px;
+    animation: floatDiagonal 8.8s linear infinite;
+    animation-delay: 6s;
+  }
+  
+  .petal.p-front-4 {
+    top: -20px;
+    right: 28%;
     width: 7px;
+    height: 11px;
+    animation: floatDiagonal 9.5s linear infinite;
+    animation-delay: 2.5s;
+  }
+  
+  .petal.p-front-5 {
+    top: -20px;
+    right: 46%;
+    width: 6.5px;
     height: 10px;
-    animation: floatDiagonal 10.5s linear infinite;
-    animation-delay: 3.5s;
+    animation: floatDiagonal 10s linear infinite;
+    animation-delay: 7.5s;
+  }
+  
+  .petal.p-front-6 {
+    top: -20px;
+    right: 70%;
+    width: 7px;
+    height: 11px;
+    animation: floatDiagonal 9s linear infinite;
+    animation-delay: 5s;
   }
