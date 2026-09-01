@@ -17,25 +17,36 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Hilangkan overflow-x pada body agar position: sticky bisa aktif */
 body {
   background-color: var(--bg-color);
   color: var(--text-main);
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  position: relative;
 }
 
-/* Header & Search Bar */
+/* Header Freeze / Sticky */
 header {
-  max-width: 1040px; /* Dipersempit agar lebih compact & editorial */
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: rgba(250, 249, 246, 0.96); /* Menutup konten saat discroll */
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+  padding: 14px 20px;
+}
+
+/* Wadah isi header agar logo di kiri & search di kanan */
+.header-container {
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 18px 16px 14px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
 }
 
 .brand-title {
@@ -43,12 +54,14 @@ header {
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .search-box {
   position: relative;
   width: 100%;
   max-width: 240px;
+  flex-shrink: 0;
 }
 
 .search-input {
