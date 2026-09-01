@@ -87,7 +87,7 @@ function renderTable(data) {
   document.getElementById('total-count').textContent = items.length;
 
   if (items.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#94a3b8;">Belum ada produk yang cocok.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#94a3b8;">Belum ada produk yang cocok.</td></tr>`;
     return;
   }
 
@@ -99,12 +99,21 @@ function renderTable(data) {
       <td><strong>${item.title}</strong><br><small style="color:#64748b;">${slug}</small></td>
       <td>${item.category || '-'}</td>
       <td>
-        <button class="btn btn-copy" onclick="copyDirectLink('${origin}/p/${slug}')" style="display:inline-flex; align-items:center; gap:5px;">
+        <button class="btn btn-copy" onclick="copyLinkText('${origin}/item/${slug}', 'Link Landing Iklan (Single Page)')" style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
-          Direct Link
+          Landing Iklan
+        </button>
+      </td>
+      <td>
+        <button class="btn btn-copy" onclick="copyLinkText('${origin}/p/${slug}', 'Direct Link Pinterest')" style="display:inline-flex; align-items:center; gap:5px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          Direct
         </button>
       </td>
       <td>
@@ -127,6 +136,11 @@ function renderTable(data) {
       </td>
     </tr>
   `).join('');
+}
+
+function copyLinkText(link, typeLabel) {
+  navigator.clipboard.writeText(link);
+  alert(`${typeLabel} berhasil disalin:\n` + link);
 }
 
 // --- SEARCH FILTER DI ADMIN PANEL ---
