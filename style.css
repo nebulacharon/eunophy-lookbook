@@ -17,7 +17,12 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Hilangkan overflow-x pada body agar position: sticky bisa aktif */
+/* Kunci Scrollbar agar Layout Tidak Patah/Geser saat Tab Kosong */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: var(--bg-color);
   color: var(--text-main);
@@ -26,20 +31,22 @@ body {
   position: relative;
 }
 
-/* Header Freeze / Sticky */
+/* ==========================================================================
+   HEADER FREEZE / STICKY
+   ========================================================================== */
+
 header {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: rgba(250, 249, 246, 0.96); /* Menutup konten saat discroll */
+  background-color: rgba(250, 249, 246, 0.96);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border-color);
   width: 100%;
   padding: 14px 20px;
 }
 
-/* Wadah isi header agar logo di kiri & search di kanan */
 .header-container {
   max-width: 1040px;
   margin: 0 auto;
@@ -89,62 +96,50 @@ header {
   align-items: center;
 }
 
-
-
 /* ==========================================================================
-   HERO EDITORIAL SECTION (SMOOTH ACCORDION COLLAPSE)
+   HERO SECTION & COLLAPSE LOGIC
    ========================================================================== */
 
-   .hero-section {
-    width: 100%;
-    background-color: #faf9f8;
-    border-bottom: 1px solid rgba(229, 229, 229, 0.6);
-    margin-bottom: 30px;
-    
-    /* Gunakan display grid untuk transisi tinggi paling halus di CSS */
-    display: grid;
-    grid-template-rows: 1fr;
-    transition: 
-      grid-template-rows 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      margin-bottom 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.4s ease;
-    overflow: hidden;
-  }
-  
-  .hero-wrapper {
-    min-height: 0; /* Wajib untuk animasi grid row */
-    max-width: 1040px;
-    height: 380px;
-    margin: 0 auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    width: 100%;
-    
-    /* Transisi isi konten & ilustrasi */
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    transition: 
-      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: opacity, transform;
-  }
-  
-  /* State saat kolom Search diketik (Smooth Collapse) */
-  .hero-section.hidden-search {
-    grid-template-rows: 0fr; /* Menyusut secara natural dari 380px ke 0px */
-    margin-bottom: 12px;
-    border-color: transparent;
-  }
-  
-  .hero-section.hidden-search .hero-wrapper {
-    opacity: 0;
-    transform: translateY(-16px) scale(0.98); /* Efek melayang naik tipis sebelum hilang */
-    pointer-events: none;
-  }
+.hero-section {
+  width: 100%;
+  background-color: #faf9f8;
+  border-bottom: 1px solid rgba(229, 229, 229, 0.6);
+  margin-bottom: 30px;
+  overflow: hidden;
+  max-height: 420px;
+  opacity: 1;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              margin-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease,
+              border-color 0.3s ease;
+}
 
-/* Typography Hero */
+.hero-wrapper {
+  max-width: 1040px;
+  height: 380px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  width: 100%;
+  transition: transform 0.35s ease, opacity 0.3s ease;
+}
+
+/* Saat Search Aktif: Menyusut Penuh ke 0px */
+.hero-section.hidden-search {
+  max-height: 0 !important;
+  margin-bottom: 8px !important;
+  opacity: 0 !important;
+  border-bottom-color: transparent !important;
+}
+
+.hero-section.hidden-search .hero-wrapper {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
 .hero-content {
   position: relative;
   z-index: 2;
@@ -161,17 +156,16 @@ header {
   letter-spacing: -0.2px;
 }
 
-/* Floating Art: Kaki utuh tidak terpotong */
 .hero-floating-art {
   position: absolute;
   right: 28px;
-  bottom: 14px; /* Diberi jarak agar sepatu utuh */
+  bottom: 14px;
   height: 88%;
   max-height: 340px;
   width: auto;
   object-fit: contain;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
   animation: subtleBreathe 6s ease-in-out infinite alternate;
   will-change: transform;
 }
@@ -183,14 +177,122 @@ header {
 }
 
 /* ==========================================================================
-   PRODUCT GRID & CARDS (LEBIH PADAT & RAPI)
+   PARTIKEL KELOPAK BUNGA DENGAN DEPTH
+   ========================================================================== */
+
+.petals-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.layer-back {
+  z-index: 1;
+  opacity: 0.55;
+  filter: blur(0.8px);
+}
+
+.layer-front {
+  z-index: 5;
+  opacity: 0.85;
+}
+
+.petal {
+  position: absolute;
+  background: linear-gradient(135deg, #cbb4db 0%, #b39ddb 50%, #dfccf1 100%);
+  border-radius: 60% 0 60% 60%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@keyframes floatDiagonal {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(-260px, 400px, 0) rotate(240deg);
+    opacity: 0;
+  }
+}
+
+/* Layer Belakang */
+.petal.p-back-1 { top: -15px; right: 6%; width: 4.5px; height: 7px; animation: floatDiagonal 11s linear infinite; animation-delay: 0s; }
+.petal.p-back-2 { top: -15px; right: 14%; width: 5px; height: 8px; animation: floatDiagonal 13s linear infinite; animation-delay: 3.5s; }
+.petal.p-back-3 { top: -15px; right: 22%; width: 4px; height: 6px; animation: floatDiagonal 12s linear infinite; animation-delay: 6.5s; }
+.petal.p-back-4 { top: -15px; right: 32%; width: 5.5px; height: 8.5px; animation: floatDiagonal 14s linear infinite; animation-delay: 1.5s; }
+.petal.p-back-5 { top: -15px; right: 55%; width: 4px; height: 6px; animation: floatDiagonal 13.5s linear infinite; animation-delay: 8s; }
+.petal.p-back-6 { top: -15px; right: 78%; width: 5px; height: 7.5px; animation: floatDiagonal 15s linear infinite; animation-delay: 4.5s; }
+
+/* Layer Depan */
+.petal.p-front-1 { top: -20px; right: 4%; width: 6.5px; height: 10.5px; animation: floatDiagonal 8.5s linear infinite; animation-delay: 1s; }
+.petal.p-front-2 { top: -20px; right: 11%; width: 7.5px; height: 12px; animation: floatDiagonal 9.2s linear infinite; animation-delay: 4s; }
+.petal.p-front-3 { top: -20px; right: 18%; width: 6px; height: 9.5px; animation: floatDiagonal 8.8s linear infinite; animation-delay: 6s; }
+.petal.p-front-4 { top: -20px; right: 28%; width: 7px; height: 11px; animation: floatDiagonal 9.5s linear infinite; animation-delay: 2.5s; }
+.petal.p-front-5 { top: -20px; right: 46%; width: 6.5px; height: 10px; animation: floatDiagonal 10s linear infinite; animation-delay: 7.5s; }
+.petal.p-front-6 { top: -20px; right: 70%; width: 7px; height: 11px; animation: floatDiagonal 9s linear infinite; animation-delay: 5s; }
+
+/* ==========================================================================
+   MAIN AREA & KATEGORI (EDITORIAL PILLS)
    ========================================================================== */
 
 main {
-  max-width: 1040px; /* Mengunci lebar agar pas dengan hero */
+  max-width: 1040px;
   margin: 0 auto;
   padding: 0 16px 48px 16px;
 }
+
+.category-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-pill {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.cat-pill:hover {
+  color: var(--text-main);
+}
+
+.cat-pill.active {
+  background: #ffffff;
+  color: var(--text-main);
+  border-color: var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ==========================================================================
+   PRODUCT GRID & CARDS
+   ========================================================================== */
 
 .lookbook-grid {
   display: grid;
@@ -200,14 +302,14 @@ main {
 
 @media (min-width: 768px) {
   .lookbook-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 kolom di tablet */
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
 }
 
 @media (min-width: 992px) {
   .lookbook-grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 kolom di desktop agar padat */
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
   }
 }
@@ -226,13 +328,13 @@ main {
 
 .lookbook-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
 }
 
 .img-container {
   position: relative;
   width: 100%;
-  padding-top: 133.33%; /* Rasio 3:4 */
+  padding-top: 133.33%;
   background: #f4f4f4;
   overflow: hidden;
 }
@@ -318,8 +420,13 @@ main {
    ========================================================================== */
 
 @media (max-width: 768px) {
+  .hero-section {
+    max-height: 320px;
+    margin-bottom: 20px;
+  }
+
   .hero-wrapper {
-    height: 290px; /* Tinggi lebih seimbang di layar HP */
+    height: 290px;
     padding: 0 16px;
   }
 
@@ -336,235 +443,6 @@ main {
     right: 12px;
     bottom: 12px;
     height: 82%;
-    max-height: 240px; /* Ukuran lebih proporsional di HP */
+    max-height: 240px;
   }
-}
-
-/* ==========================================================================
-   HERO FLOATING ART (LAYER KUNCI: Z-INDEX 2)
-   ========================================================================== */
-
-   .hero-floating-art {
-    position: absolute;
-    right: 28px;
-    bottom: 14px;
-    height: 88%;
-    max-height: 340px;
-    width: auto;
-    object-fit: contain;
-    pointer-events: none;
-    z-index: 2; /* Berada tepat di tengah antara layer-back dan layer-front */
-    animation: subtleBreathe 6s ease-in-out infinite alternate;
-    will-change: transform;
-  }
-  
-  /* ==========================================================================
-     PETALS / PARTICLES WITH 3D DEPTH
-     ========================================================================== */
-  
-  .petals-container {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  
-  /* Layer Belakang (Z-Index 1): Lebih samar, sedikit blur, di belakang tubuh */
-  .layer-back {
-    z-index: 1;
-    opacity: 0.55;
-    filter: blur(0.8px);
-  }
-  
-  /* Layer Depan (Z-Index 5): Tajam, kontras, melintas di DEPAN karakter */
-  .layer-front {
-    z-index: 5;
-    opacity: 0.85;
-  }
-  
-  /* Bentuk Dasar Kelopak */
-  .petal {
-    position: absolute;
-    background: linear-gradient(135deg, #cbb4db 0%, #b39ddb 50%, #dfccf1 100%);
-    border-radius: 60% 0 60% 60%;
-    pointer-events: none;
-    will-change: transform, opacity;
-  }
-  
-  /* Animasi Meluncur Diagonal dari Kanan Atas ke Kiri Bawah */
-  @keyframes floatDiagonal {
-    0% {
-      transform: translate3d(0, 0, 0) rotate(0deg);
-      opacity: 0;
-    }
-    15% {
-      opacity: 0.9;
-    }
-    85% {
-      opacity: 0.9;
-    }
-    100% {
-      transform: translate3d(-260px, 400px, 0) rotate(240deg);
-      opacity: 0;
-    }
-  }
-  
-  /* -------------------------------------------------------------
-     LAYER BELAKANG (Fokus padat di area belakang ilustrasi & tengah)
-     ------------------------------------------------------------- */
-  .petal.p-back-1 {
-    top: -15px;
-    right: 6%; /* Dekat kepala ilustrasi dari belakang */
-    width: 4.5px;
-    height: 7px;
-    animation: floatDiagonal 11s linear infinite;
-    animation-delay: 0s;
-  }
-  
-  .petal.p-back-2 {
-    top: -15px;
-    right: 14%; /* Tepat di belakang bahu ilustrasi */
-    width: 5px;
-    height: 8px;
-    animation: floatDiagonal 13s linear infinite;
-    animation-delay: 3.5s;
-  }
-  
-  .petal.p-back-3 {
-    top: -15px;
-    right: 22%; /* Sisi kiri ilustrasi */
-    width: 4px;
-    height: 6px;
-    animation: floatDiagonal 12s linear infinite;
-    animation-delay: 6.5s;
-  }
-  
-  .petal.p-back-4 {
-    top: -15px;
-    right: 32%;
-    width: 5.5px;
-    height: 8.5px;
-    animation: floatDiagonal 14s linear infinite;
-    animation-delay: 1.5s;
-  }
-  
-  .petal.p-back-5 {
-    top: -15px;
-    right: 55%;
-    width: 4px;
-    height: 6px;
-    animation: floatDiagonal 13.5s linear infinite;
-    animation-delay: 8s;
-  }
-  
-  .petal.p-back-6 {
-    top: -15px;
-    right: 78%;
-    width: 5px;
-    height: 7.5px;
-    animation: floatDiagonal 15s linear infinite;
-    animation-delay: 4.5s;
-  }
-  
-  /* -------------------------------------------------------------
-     LAYER DEPAN (Melintas langsung di depan wajah, baju, & gaun)
-     ------------------------------------------------------------- */
-  .petal.p-front-1 {
-    top: -20px;
-    right: 4%; /* Jatuh melintas di depan sisi kanan gaun */
-    width: 6.5px;
-    height: 10.5px;
-    animation: floatDiagonal 8.5s linear infinite;
-    animation-delay: 1s;
-  }
-  
-  .petal.p-front-2 {
-    top: -20px;
-    right: 11%; /* Jatuh melintas langsung di depan dada & tas */
-    width: 7.5px;
-    height: 12px;
-    animation: floatDiagonal 9.2s linear infinite;
-    animation-delay: 4s;
-  }
-  
-  .petal.p-front-3 {
-    top: -20px;
-    right: 18%; /* Melintas di depan rambut & sisi kiri baju */
-    width: 6px;
-    height: 9.5px;
-    animation: floatDiagonal 8.8s linear infinite;
-    animation-delay: 6s;
-  }
-  
-  .petal.p-front-4 {
-    top: -20px;
-    right: 28%;
-    width: 7px;
-    height: 11px;
-    animation: floatDiagonal 9.5s linear infinite;
-    animation-delay: 2.5s;
-  }
-  
-  .petal.p-front-5 {
-    top: -20px;
-    right: 46%;
-    width: 6.5px;
-    height: 10px;
-    animation: floatDiagonal 10s linear infinite;
-    animation-delay: 7.5s;
-  }
-  
-  .petal.p-front-6 {
-    top: -20px;
-    right: 70%;
-    width: 7px;
-    height: 11px;
-    animation: floatDiagonal 9s linear infinite;
-    animation-delay: 5s;
-  }
-
-  /* ==========================================================================
-   MAIN SEGMENT NAVIGATION (EDITORIAL PILLS)
-   ========================================================================== */
-
-.category-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
-  overflow-x: auto;
-  white-space: nowrap;
-  padding-bottom: 4px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-}
-
-.category-nav::-webkit-scrollbar {
-  display: none; /* Chrome & Safari */
-}
-
-.cat-pill {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  letter-spacing: 0.3px;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-
-.cat-pill:hover {
-  color: var(--text-main);
-}
-
-/* Active State: Kotak tumpul lembut clean seperti referensi */
-.cat-pill.active {
-  background: #ffffff;
-  color: var(--text-main);
-  border-color: var(--border-color);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
