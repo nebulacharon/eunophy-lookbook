@@ -97,7 +97,7 @@ header {
 }
 
 /* ==========================================================================
-   HERO SECTION & COLLAPSE LOGIC
+   HERO SECTION & OPTICALLY BALANCED TYPOGRAPHY
    ========================================================================== */
 
 .hero-section {
@@ -140,10 +140,12 @@ header {
   pointer-events: none;
 }
 
+/* Typography Hero (Digeser ke kanan agar simetris dengan siluet tubuh di kanan) */
 .hero-content {
   position: relative;
   z-index: 2;
   max-width: 440px;
+  margin-left: 56px;
   pointer-events: none;
 }
 
@@ -156,9 +158,10 @@ header {
   letter-spacing: -0.2px;
 }
 
+/* Floating Art */
 .hero-floating-art {
   position: absolute;
-  right: 28px;
+  right: 20px;
   bottom: 14px;
   height: 88%;
   max-height: 340px;
@@ -431,7 +434,8 @@ main {
   }
 
   .hero-content {
-    max-width: 200px;
+    margin-left: 20px;
+    max-width: 210px;
   }
 
   .hero-title {
@@ -440,7 +444,7 @@ main {
   }
 
   .hero-floating-art {
-    right: 12px;
+    right: 4px;
     bottom: 12px;
     height: 82%;
     max-height: 240px;
