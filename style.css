@@ -522,3 +522,49 @@ main {
     animation: floatDiagonal 9s linear infinite;
     animation-delay: 5s;
   }
+
+  /* ==========================================================================
+   MAIN SEGMENT NAVIGATION (EDITORIAL PILLS)
+   ========================================================================== */
+
+.category-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.category-nav::-webkit-scrollbar {
+  display: none; /* Chrome & Safari */
+}
+
+.cat-pill {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.cat-pill:hover {
+  color: var(--text-main);
+}
+
+/* Active State: Kotak tumpul lembut clean seperti referensi */
+.cat-pill.active {
+  background: #ffffff;
+  color: var(--text-main);
+  border-color: var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}

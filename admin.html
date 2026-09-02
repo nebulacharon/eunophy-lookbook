@@ -60,7 +60,18 @@
         <label>Kode / ID Produk (misal: 6130.b atau Noir Blazer)</label>
         <input type="text" id="title" placeholder="6130.b">
       </div>
-
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px;">Segmen Utama (Main Segment)</label>
+        <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:13px;">
+          <label><input type="radio" name="main_segment" value="tops" checked> Tops</label>
+          <label><input type="radio" name="main_segment" value="bottoms"> Bottoms</label>
+          <label><input type="radio" name="main_segment" value="dresses"> Dresses</label>
+          <label><input type="radio" name="main_segment" value="outerwear"> Outerwear</label>
+          <label><input type="radio" name="main_segment" value="shoes"> Shoes</label>
+          <label><input type="radio" name="main_segment" value="bags"> Bags</label>
+          <label><input type="radio" name="main_segment" value="accessories"> Accessories</label>
+        </div>
+      </div>
       <div class="form-group">
         <label>Kategori Bebas (misal: Dress & Set, Blazer, Celana, dll)</label>
         <input type="text" id="category" placeholder="Ketik kategori...">
@@ -103,7 +114,7 @@
             </tr>
           </thead>
           <tbody id="table-body">
-            <tr><td colspan="5" style="text-align: center; padding: 24px; color: #94a3b8;">Memuat data koleksi...</td></tr>
+            <tr><td colspan="6" style="text-align: center; padding: 24px; color: #94a3b8;">Memuat data koleksi...</td></tr>
           </tbody>
         </table>
       </div>
@@ -126,8 +137,22 @@
         <input type="text" id="edit-title">
       </div>
 
+      <!-- Pilihan Main Segment saat Edit -->
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px;">Segmen Utama (Main Segment)</label>
+        <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:13px;">
+          <label><input type="radio" name="edit_main_segment" value="tops"> Tops</label>
+          <label><input type="radio" name="edit_main_segment" value="bottoms"> Bottoms</label>
+          <label><input type="radio" name="edit_main_segment" value="dresses"> Dresses</label>
+          <label><input type="radio" name="edit_main_segment" value="outerwear"> Outerwear</label>
+          <label><input type="radio" name="edit_main_segment" value="shoes"> Shoes</label>
+          <label><input type="radio" name="edit_main_segment" value="bags"> Bags</label>
+          <label><input type="radio" name="edit_main_segment" value="accessories"> Accessories</label>
+        </div>
+      </div>
+
       <div class="form-group">
-        <label>Kategori</label>
+        <label>Kategori Bebas</label>
         <input type="text" id="edit-category">
       </div>
 

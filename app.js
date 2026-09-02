@@ -1,11 +1,15 @@
 let catalogData = {};
+let currentSegment = 'all';
+
+const searchInput = document.getElementById('search-input');
+const hero = document.querySelector('.hero-section');
 
 async function loadCatalog() {
   const container = document.getElementById('grid-container');
   try {
     const res = await fetch('/api/products');
     catalogData = await res.json();
-    renderCards(catalogData);
+    applyFilter();
   } catch (err) {
     container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px;">Gagal memuat katalog.</div>`;
   }
@@ -44,34 +48,60 @@ function renderCards(data) {
   `).join('');
 }
 
-// Search Filter Realtime + Smooth Auto-Collapse Hero
-const searchInput = document.getElementById('search-input');
-const hero = document.querySelector('.hero-section');
-
-searchInput.addEventListener('input', (e) => {
-  const query = e.target.value.toLowerCase().trim();
-
-  // Animasi hero: menyusut jika ada teks pencarian, muncul lagi jika kosong
-  if (hero) {
-    if (query.length > 0) {
-      hero.classList.add('hidden-search');
-    } else {
-      hero.classList.remove('hidden-search');
-    }
-  }
-
-  // Logika filter bawaan (tidak diubah sama sekali)
+// Logika Gabungan: Filter Segmen + Search Input Universal
+function applyFilter() {
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
   const filtered = {};
+
   Object.entries(catalogData).forEach(([slug, item]) => {
+    // Cocokkan main segment (jika belum diset di data lama, fallback ke 'tops')
+    const itemSegment = (item.segment || 'tops').toLowerCase();
+    const matchSegment = (currentSegment === 'all') || (itemSegment === currentSegment);
+
     const matchTitle = (item.title || '').toLowerCase().includes(query);
-    const matchCat = (item.category || '').toLowerCase().includes(query);
+    const matchSubCat = (item.category || '').toLowerCase().includes(query);
     const matchSlug = slug.toLowerCase().includes(query);
-    if (matchTitle || matchCat || matchSlug) {
+
+    if (matchSegment && (matchTitle || matchSubCat || matchSlug)) {
       filtered[slug] = item;
     }
   });
 
   renderCards(filtered);
+}
+
+// Event Listener Tab Kategori Pill
+document.querySelectorAll('.cat-pill').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    document.querySelectorAll('.cat-pill').forEach((b) => b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    currentSegment = e.currentTarget.dataset.segment;
+    applyFilter();
+  });
 });
+
+// Event Listener Search Realtime + Smooth Auto-Collapse Hero
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+
+    if (hero) {
+      if (query.length > 0) {
+        hero.classList.add('hidden-search');
+        // Reset tab pill ke 'All' saat pencarian aktif agar hasil menyeluruh
+        if (currentSegment !== 'all') {
+          currentSegment = 'all';
+          document.querySelectorAll('.cat-pill').forEach((b) => {
+            b.classList.toggle('active', b.dataset.segment === 'all');
+          });
+        }
+      } else {
+        hero.classList.remove('hidden-search');
+      }
+    }
+
+    applyFilter();
+  });
+}
 
 loadCatalog();

@@ -14,7 +14,7 @@ function processImageToHDWebP(file, callback) {
     img.src = event.target.result;
     img.onload = function () {
       const canvas = document.createElement('canvas');
-      const maxDim = 1000; // Resolusi tajam untuk tampilan katalog lookbook
+      const maxDim = 1000;
       let width = img.width;
       let height = img.height;
 
@@ -35,7 +35,6 @@ function processImageToHDWebP(file, callback) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Konversi ke WebP kualitas tinggi 90%
       const optimizedBase64 = canvas.toDataURL('image/webp', 0.90);
       callback(optimizedBase64);
     };
@@ -77,7 +76,7 @@ async function loadProducts() {
     catalog = await res.json();
     renderTable(catalog);
   } catch (err) {
-    document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:red;">Gagal memuat katalog.</td></tr>`;
+    document.getElementById('table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:red;">Gagal memuat katalog.</td></tr>`;
   }
 }
 
@@ -97,7 +96,10 @@ function renderTable(data) {
     <tr>
       <td><img src="${item.image}" class="thumb" onerror="this.src='https://via.placeholder.com/44x58?text=No+Img'"></td>
       <td><strong>${item.title}</strong><br><small style="color:#64748b;">${slug}</small></td>
-      <td>${item.category || '-'}</td>
+      <td>
+        <span style="display:inline-block; font-size:11px; padding:2px 6px; background:#f1f5f9; border-radius:4px; margin-bottom:3px; text-transform:capitalize;">${item.segment || 'tops'}</span><br>
+        <span style="font-size:12px; color:#64748b;">${item.category || '-'}</span>
+      </td>
       <td>
         <button class="btn btn-copy" onclick="copyLinkText('${origin}/item/${slug}', 'Link Landing Iklan (Single Page)')" style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -151,8 +153,9 @@ document.getElementById('search-table').addEventListener('input', (e) => {
   Object.entries(catalog).forEach(([slug, item]) => {
     const matchTitle = (item.title || '').toLowerCase().includes(query);
     const matchCategory = (item.category || '').toLowerCase().includes(query);
+    const matchSegment = (item.segment || '').toLowerCase().includes(query);
     const matchSlug = slug.toLowerCase().includes(query);
-    if (matchTitle || matchCategory || matchSlug) {
+    if (matchTitle || matchCategory || matchSegment || matchSlug) {
       filtered[slug] = item;
     }
   });
@@ -165,6 +168,7 @@ async function saveNewProduct() {
   const title = document.getElementById('title').value.trim();
   const category = document.getElementById('category').value.trim();
   const affiliate_url = document.getElementById('affiliate_url').value.trim();
+  const selectedSegment = document.querySelector('input[name="main_segment"]:checked')?.value || 'tops';
 
   if (!title || !affiliate_url) {
     alert("Kode Produk dan Link Shopee wajib diisi!");
@@ -182,6 +186,7 @@ async function saveNewProduct() {
     slug: slug,
     product: {
       title: title,
+      segment: selectedSegment,
       category: category || 'Lookbook',
       image: currentBase64Image,
       affiliate_url: affiliate_url
@@ -233,7 +238,12 @@ function openEditModal(slug) {
   document.getElementById('edit-category').value = item.category || '';
   document.getElementById('edit-affiliate-url').value = item.affiliate_url || '';
   document.getElementById('edit-preview-img').src = item.image;
-  editBase64Image = item.image; // default jika foto tidak diganti
+  editBase64Image = item.image;
+
+  // Pilih radio button segment yang sesuai
+  const segmentToSelect = item.segment || 'tops';
+  const radio = document.querySelector(`input[name="edit_main_segment"][value="${segmentToSelect}"]`);
+  if (radio) radio.checked = true;
 
   document.getElementById('edit-modal').classList.add('active');
 }
@@ -248,6 +258,7 @@ async function submitProductEdit() {
   const newTitle = document.getElementById('edit-title').value.trim();
   const newCategory = document.getElementById('edit-category').value.trim();
   const newAffiliateUrl = document.getElementById('edit-affiliate-url').value.trim();
+  const selectedSegment = document.querySelector('input[name="edit_main_segment"]:checked')?.value || 'tops';
 
   if (!newTitle || !newAffiliateUrl) {
     alert("Kode Produk dan Link Shopee tidak boleh kosong!");
@@ -260,6 +271,7 @@ async function submitProductEdit() {
     slug: newSlug,
     product: {
       title: newTitle,
+      segment: selectedSegment,
       category: newCategory || 'Lookbook',
       image: editBase64Image,
       affiliate_url: newAffiliateUrl
@@ -267,7 +279,6 @@ async function submitProductEdit() {
   };
 
   try {
-    // Jika slug berubah, hapus slug lama terlebih dahulu
     if (oldSlug !== newSlug) {
       await fetch('/api/products/delete', {
         method: 'POST',
@@ -276,7 +287,6 @@ async function submitProductEdit() {
       });
     }
 
-    // Simpan data produk yang diperbarui
     const res = await fetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
@@ -309,11 +319,6 @@ async function deleteProduct(slug) {
   });
 
   if (res.ok) loadProducts();
-}
-
-function copyDirectLink(link) {
-  navigator.clipboard.writeText(link);
-  alert("Direct Link Pinterest berhasil disalin:\n" + link);
 }
 
 loadProducts();
