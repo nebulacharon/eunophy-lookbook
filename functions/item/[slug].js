@@ -88,7 +88,7 @@ export async function onRequestGet(context) {
     </header>
   
     <div class="single-container">
-      <a href="${product.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer">
+      <a href="${product.affiliate_url}" class="lookbook-card">
         <div class="img-container">
           <img src="${product.image}" alt="${product.title}">
           <div class="overlay-info">
