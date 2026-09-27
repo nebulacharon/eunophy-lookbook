@@ -483,3 +483,15 @@ main {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -6px); }
 }
+
+/* Mencegah body utama di-scroll saat modal terbuka */
+body.no-scroll {
+  overflow: hidden !important;
+  touch-action: none; /* Mengunci gesture sentuhan background di HP */
+}
+
+/* Memastikan area scroll di dalam modal TIDAK bocor ke background */
+.modal-body-scrollable {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch; /* Scroll mulus untuk iOS/Safari */
+}
