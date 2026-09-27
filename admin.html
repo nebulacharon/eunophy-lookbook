@@ -7,7 +7,7 @@
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #f8fafc; margin: 0; padding: 24px 16px; color: #0f172a; }
-    .admin-container { max-width: 960px; margin: 0 auto; }
+    .admin-container { max-width: 1000px; margin: 0 auto; }
     
     /* Navigation Tabs */
     .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; overflow-x: auto; }
@@ -20,7 +20,7 @@
     .card { background: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
     h2 { margin: 0 0 16px 0; font-size: 18px; letter-spacing: 0.5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
     
-    .form-group { margin-bottom: 14px; }
+    .form-group { margin-bottom: 16px; position: relative; }
     label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #475569; }
     input[type="text"], input[type="file"], select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13.5px; outline: none; }
     input[type="file"] { padding: 8px; background: #f8fafc; font-size: 12px; }
@@ -36,10 +36,6 @@
     .btn-edit { background: #e0e7ff; color: #3730a3; padding: 6px 10px; font-size: 11.5px; }
     .btn-danger { background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 11.5px; }
     
-    /* Multiselect / Checkbox Items Box */
-    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; background: #f8fafc; }
-    .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
-
     /* Search Bar & Stats */
     .table-header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
     .table-title { font-size: 15px; font-weight: 600; }
@@ -48,17 +44,83 @@
     /* Table Responsive */
     .table-wrapper { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: middle; }
     th { background: #f8fafc; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 600; }
     .thumb { width: 44px; height: 58px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; }
-    .action-group { display: flex; gap: 6px; align-items: center; }
+    .action-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
     /* Modal Popup Edit */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
     .modal-overlay.active { display: flex; }
-    .modal-box { background: #ffffff; width: 100%; max-width: 520px; padding: 22px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
+    .modal-box { background: #ffffff; width: 100%; max-width: 540px; padding: 22px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
     .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
+
+    /* Status Badges */
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+    .badge-active { background: #dcfce7; color: #166534; }
+    .badge-inactive { background: #f1f5f9; color: #64748b; }
+    .badge-featured { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+    /* UI Product Tag Picker (Search & Select) */
+    .search-dropdown-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .search-result-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 12.5px;
+    }
+    .search-result-item:hover { background: #f8fafc; }
+    .selected-products-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      min-height: 48px;
+    }
+    .product-chip {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .product-chip-remove {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 0 2px;
+    }
+
+    /* Checkbox & Switch Container */
+    .switch-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; font-weight: normal; color: #0f172a; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -72,7 +134,7 @@
       <button class="tab-btn" onclick="switchAdminTab('tab-collections')">3. Collections (`CL`)</button>
     </div>
 
-    <!-- TAB 1: PRODUK ITEMS (SISTEM LAMA KAMU DENGAN UI UTUH) -->
+    <!-- TAB 1: PRODUK ITEMS -->
     <div id="tab-products" class="tab-content active">
       
       <!-- FORM TAMBAH PRODUK -->
@@ -145,7 +207,7 @@
 
     </div>
 
-    <!-- TAB 2: CURATED LOOKS (PINTEREST OUTFIT TARGET) -->
+    <!-- TAB 2: CURATED LOOKS -->
     <div id="tab-looks" class="tab-content">
       <div class="card">
         <h2>EUNOPHY — Buat Curated Look Baru</h2>
@@ -175,10 +237,15 @@
           </div>
         </div>
 
+        <!-- SEARCH & SELECT ITEM PRODUK UNTUK LOOK -->
         <div class="form-group">
-          <label>Pilih Item Produk yang Ada di Look Ini (Centang Multi-Product):</label>
-          <div class="checkbox-grid" id="look-products-selector">
-            <span style="color:#94a3b8; font-size:12px;">Memuat daftar produk...</span>
+          <label>Pilih Item Produk untuk Look Ini:</label>
+          <input type="text" id="look-product-search" placeholder="🔍 Ketik ID atau Nama Produk (misal: EUN-0001)..." autocomplete="off">
+          <div id="look-product-results" class="search-dropdown-results"></div>
+          
+          <!-- Selected Tag Chips -->
+          <div id="selected-products-container" class="selected-products-tags">
+            <span style="color:#94a3b8; font-size:12px;">Belum ada produk yang ditambahkan ke Look ini.</span>
           </div>
         </div>
 
@@ -187,7 +254,10 @@
 
       <!-- TABEL DAFTAR LOOKS -->
       <div class="card">
-        <div class="table-title" style="margin-bottom:14px;">Daftar Curated Looks</div>
+        <div class="table-header-bar">
+          <div class="table-title">Daftar Curated Looks</div>
+          <input type="text" id="search-looks-table" class="search-admin" placeholder="🔍 Cari ID / Judul Look...">
+        </div>
         <div class="table-wrapper">
           <table>
             <thead>
@@ -208,7 +278,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: COLLECTIONS (KLASIFIKASI TEMA UTAMA) -->
+    <!-- TAB 3: COLLECTIONS -->
     <div id="tab-collections" class="tab-content">
       <div class="card">
         <h2>EUNOPHY — Kelola Koleksi Utama (Tema)</h2>
@@ -228,12 +298,26 @@
           <textarea id="col-desc" rows="3" placeholder="Warm & cozy layers for cold days..."></textarea>
         </div>
 
+        <!-- OPTIONS: REKOMENDASI & STATUS -->
+        <div class="form-group" style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+          <label class="switch-label">
+            <input type="checkbox" id="col-is-featured" checked>
+            <strong>⭐ Rekomendasikan / Tampilkan di Halaman Utama (Featured Row Slider)</strong>
+          </label>
+          <small style="color: #64748b; display: block; margin-top: 4px; margin-left: 24px;">
+            Jika diaktifkan, Koleksi ini beserta Look-nya akan tampil berjejer horizontal di tab Curated Looks halaman utama.
+          </small>
+        </div>
+
         <button class="btn btn-dark" onclick="saveNewCollection()">Simpan Koleksi Utama</button>
       </div>
 
       <!-- TABEL DAFTAR COLLECTIONS -->
       <div class="card">
-        <div class="table-title" style="margin-bottom:14px;">Daftar Koleksi Utama</div>
+        <div class="table-header-bar">
+          <div class="table-title">Daftar Koleksi Utama</div>
+          <input type="text" id="search-collections-table" class="search-admin" placeholder="🔍 Cari ID / Nama Koleksi...">
+        </div>
         <div class="table-wrapper">
           <table>
             <thead>
@@ -241,11 +325,12 @@
                 <th>ID Koleksi</th>
                 <th>Nama Koleksi</th>
                 <th>Deskripsi</th>
+                <th>Status Rekomendasi</th>
                 <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="collections-table-body">
-              <tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Koleksi Utama.</td></tr>
+              <tr><td colspan="5" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Koleksi Utama.</td></tr>
             </tbody>
           </table>
         </div>
@@ -254,7 +339,7 @@
 
   </div>
 
-  <!-- MODAL EDIT POPUP PRODUK (ASLI MILIKMU) -->
+  <!-- MODAL EDIT POPUP PRODUK (EUN) -->
   <div id="edit-modal" class="modal-overlay">
     <div class="modal-box">
       <div class="modal-header">
@@ -269,7 +354,6 @@
         <input type="text" id="edit-title">
       </div>
 
-      <!-- Pilihan Main Segment saat Edit -->
       <div style="margin-bottom: 16px;">
         <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px;">Segmen Utama (Main Segment)</label>
         <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:13px;">
@@ -304,6 +388,95 @@
       <div style="display: flex; gap: 10px; margin-top: 18px;">
         <button class="btn btn-dark" style="flex: 1;" onclick="submitProductEdit()">Perbarui Produk</button>
         <button class="btn" style="background: #e2e8f0; color: #334155;" onclick="closeEditModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT POPUP LOOKS (LK) -->
+  <div id="edit-look-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 16px;">Edit Curated Look</h3>
+        <button class="modal-close" onclick="closeEditLookModal()">&times;</button>
+      </div>
+
+      <input type="hidden" id="edit-look-old-id">
+
+      <div class="form-group">
+        <label>ID Look / Slug</label>
+        <input type="text" id="edit-look-id" readonly style="background:#f1f5f9; color:#64748b;">
+      </div>
+
+      <div class="form-group">
+        <label>Judul Look / Outfit</label>
+        <input type="text" id="edit-look-title">
+      </div>
+
+      <div class="form-group">
+        <label>Pilih Koleksi Utama (Tema)</label>
+        <select id="edit-look-collection-select">
+          <option value="">-- Pilih Koleksi --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Ganti Hero Image (Kosongkan jika tidak diubah)</label>
+        <input type="file" id="edit-look-image-file" accept="image/*">
+        <div class="preview-box">
+          <img id="edit-look-preview-img" class="preview-img" style="display: block;" alt="Preview">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Item Produk dalam Look Ini:</label>
+        <input type="text" id="edit-look-product-search" placeholder="🔍 Cari & Tambah Produk Baru..." autocomplete="off">
+        <div id="edit-look-product-results" class="search-dropdown-results"></div>
+        
+        <div id="edit-selected-products-container" class="selected-products-tags"></div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 18px;">
+        <button class="btn btn-dark" style="flex: 1;" onclick="submitLookEdit()">Perbarui Look</button>
+        <button class="btn" style="background: #e2e8f0; color: #334155;" onclick="closeEditLookModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT POPUP COLLECTION (CL) -->
+  <div id="edit-col-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="margin: 0; font-size: 16px;">Edit Koleksi Utama</h3>
+        <button class="modal-close" onclick="closeEditColModal()">&times;</button>
+      </div>
+
+      <input type="hidden" id="edit-col-old-id">
+
+      <div class="form-group">
+        <label>ID Koleksi</label>
+        <input type="text" id="edit-col-id" readonly style="background:#f1f5f9; color:#64748b;">
+      </div>
+
+      <div class="form-group">
+        <label>Nama Koleksi</label>
+        <input type="text" id="edit-col-title">
+      </div>
+
+      <div class="form-group">
+        <label>Deskripsi Singkat</label>
+        <textarea id="edit-col-desc" rows="3"></textarea>
+      </div>
+
+      <div class="form-group" style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+        <label class="switch-label">
+          <input type="checkbox" id="edit-col-is-featured">
+          <strong>⭐ Rekomendasikan di Halaman Utama</strong>
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 18px;">
+        <button class="btn btn-dark" style="flex: 1;" onclick="submitColEdit()">Perbarui Koleksi</button>
+        <button class="btn" style="background: #e2e8f0; color: #334155;" onclick="closeEditColModal()">Batal</button>
       </div>
     </div>
   </div>

@@ -6,9 +6,15 @@ let catalog = {};
 let looks = {};
 let collections = {};
 
+// Temporary State Base64 Images
 let currentBase64Image = "";
 let editBase64Image = "";
 let lookBase64Image = "";
+let editLookBase64Image = "";
+
+// State Selected Products untuk Form Look (Create & Edit)
+let selectedLookProducts = [];
+let editSelectedLookProducts = [];
 
 // --- FUNGSI KOMPRESI HD CANVAS (WEBP QUALITY 0.90) ---
 function processImageToHDWebP(file, callback) {
@@ -51,49 +57,69 @@ function switchAdminTab(tabId) {
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-  event.target.classList.add('active');
-  document.getElementById(tabId).classList.add('active');
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+  const targetTab = document.getElementById(tabId);
+  if (targetTab) targetTab.classList.add('active');
 }
 
 // --- IMAGE UPLOAD LISTENERS ---
 // 1. Upload Form Tambah Produk
-document.getElementById('image_file').addEventListener('change', function (e) {
+document.getElementById('image_file')?.addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
 
   const status = document.getElementById('image_status');
-  status.textContent = "Mengompresi HD...";
+  if (status) status.textContent = "Mengompresi HD...";
 
   processImageToHDWebP(file, (base64) => {
     currentBase64Image = base64;
     const preview = document.getElementById('image_preview');
-    preview.src = base64;
-    preview.style.display = 'block';
-    status.textContent = "Foto siap diupload (HD WebP)";
+    if (preview) {
+      preview.src = base64;
+      preview.style.display = 'block';
+    }
+    if (status) status.textContent = "Foto siap diupload (HD WebP)";
   });
 });
 
 // 2. Upload Form Edit Produk
-document.getElementById('edit-image-file').addEventListener('change', function (e) {
+document.getElementById('edit-image-file')?.addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
 
   processImageToHDWebP(file, (base64) => {
     editBase64Image = base64;
-    document.getElementById('edit-preview-img').src = base64;
+    const preview = document.getElementById('edit-preview-img');
+    if (preview) preview.src = base64;
   });
 });
 
-// 3. Upload Form Curated Look Hero Image
-document.getElementById('look-image-file').addEventListener('change', function (e) {
+// 3. Upload Form Curated Look Hero Image (Create)
+document.getElementById('look-image-file')?.addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
 
   processImageToHDWebP(file, (base64) => {
     lookBase64Image = base64;
     const preview = document.getElementById('look-image-preview');
-    preview.src = base64;
-    preview.style.display = 'block';
+    if (preview) {
+      preview.src = base64;
+      preview.style.display = 'block';
+    }
+  });
+});
+
+// 4. Upload Form Curated Look Hero Image (Edit)
+document.getElementById('edit-look-image-file')?.addEventListener('change', function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  processImageToHDWebP(file, (base64) => {
+    editLookBase64Image = base64;
+    const preview = document.getElementById('edit-look-preview-img');
+    if (preview) preview.src = base64;
   });
 });
 
@@ -102,6 +128,8 @@ async function initDashboardData() {
   await loadProducts();
   await loadCollections();
   await loadLooks();
+  setupLookProductSearch();
+  setupEditLookProductSearch();
 }
 
 // 1. AMBIL DATA PRODUK
@@ -110,7 +138,6 @@ async function loadProducts() {
     const res = await fetch('/api/products?type=catalog');
     catalog = await res.json();
     renderTable(catalog);
-    renderProductCheckboxesInLookForm();
   } catch (err) {
     document.getElementById('table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:red;">Gagal memuat katalog.</td></tr>`;
   }
@@ -143,7 +170,8 @@ async function loadLooks() {
 function renderTable(data) {
   const tbody = document.getElementById('table-body');
   const items = Object.entries(data);
-  document.getElementById('total-count').textContent = items.length;
+  const totalCount = document.getElementById('total-count');
+  if (totalCount) totalCount.textContent = items.length;
 
   if (items.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#94a3b8;">Belum ada produk yang cocok.</td></tr>`;
@@ -194,7 +222,7 @@ function copyLinkText(link, typeLabel) {
 }
 
 // --- SEARCH FILTER DI TABEL PRODUK ---
-document.getElementById('search-table').addEventListener('input', (e) => {
+document.getElementById('search-table')?.addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase().trim();
   const filtered = {};
 
@@ -332,7 +360,7 @@ async function submitProductEdit() {
       await fetch('/api/products/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
-        body: JSON.stringify({ slug: oldSlug })
+        body: JSON.stringify({ slug: oldSlug, target: 'catalog' })
       });
     }
 
@@ -364,41 +392,180 @@ async function deleteProduct(slug) {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${TOKEN}`
     },
-    body: JSON.stringify({ slug })
+    body: JSON.stringify({ slug, target: 'catalog' })
   });
 
   if (res.ok) loadProducts();
 }
 
-// ==========================================
-// LOGIKA BARU: CURATED LOOKS & COLLECTIONS
-// ==========================================
+// =========================================================
+// LOGIKA SEARCH & CHIPS PRODUCT PICKER UNTUK CURATED LOOKS
+// =========================================================
 
-// Render Checkbox Produk Atomik untuk Form Look
-function renderProductCheckboxesInLookForm() {
-  const container = document.getElementById('look-products-selector');
-  const items = Object.entries(catalog);
+function setupLookProductSearch() {
+  const searchInput = document.getElementById('look-product-search');
+  const resultsContainer = document.getElementById('look-product-results');
 
-  if (items.length === 0) {
-    container.innerHTML = `<span style="color:#94a3b8; font-size:12px;">Belum ada produk di katalog.</span>`;
+  if (!searchInput || !resultsContainer) return;
+
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (!query) {
+      resultsContainer.style.display = 'none';
+      return;
+    }
+
+    const matches = Object.entries(catalog).filter(([slug, item]) => {
+      const matchTitle = (item.title || '').toLowerCase().includes(query);
+      const matchSlug = slug.toLowerCase().includes(query);
+      return (matchTitle || matchSlug) && !selectedLookProducts.includes(slug);
+    });
+
+    if (matches.length === 0) {
+      resultsContainer.innerHTML = `<div class="search-result-item" style="color:#94a3b8;">Tidak ada produk cocok</div>`;
+    } else {
+      resultsContainer.innerHTML = matches.map(([slug, item]) => `
+        <div class="search-result-item" onclick="addLookProduct('${slug}')">
+          <img src="${item.image}" style="width:30px; height:40px; object-fit:cover; border-radius:3px;">
+          <div>
+            <strong>${item.title}</strong> <small style="color:#64748b;">(${slug})</small>
+          </div>
+        </div>
+      `).join('');
+    }
+    resultsContainer.style.display = 'block';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+      resultsContainer.style.display = 'none';
+    }
+  });
+}
+
+function addLookProduct(slug) {
+  if (!selectedLookProducts.includes(slug)) {
+    selectedLookProducts.push(slug);
+    renderLookProductChips();
+  }
+  document.getElementById('look-product-search').value = '';
+  document.getElementById('look-product-results').style.display = 'none';
+}
+
+function removeLookProduct(slug) {
+  selectedLookProducts = selectedLookProducts.filter(s => s !== slug);
+  renderLookProductChips();
+}
+
+function renderLookProductChips() {
+  const container = document.getElementById('selected-products-container');
+  if (!container) return;
+
+  if (selectedLookProducts.length === 0) {
+    container.innerHTML = `<span style="color:#94a3b8; font-size:12px;">Belum ada produk yang ditambahkan ke Look ini.</span>`;
     return;
   }
 
-  container.innerHTML = items.map(([slug, item]) => `
-    <label class="checkbox-item">
-      <input type="checkbox" name="look_product" value="${slug}">
-      <span><strong>${item.title}</strong> (${item.segment || 'item'})</span>
-    </label>
-  `).join('');
+  container.innerHTML = selectedLookProducts.map(slug => {
+    const item = catalog[slug] || { title: slug };
+    return `
+      <div class="product-chip">
+        <span>${item.title}</span>
+        <button type="button" class="product-chip-remove" onclick="removeLookProduct('${slug}')">&times;</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// SETUP UNTUK EDIT LOOK FORM SEARCH & CHIPS
+function setupEditLookProductSearch() {
+  const searchInput = document.getElementById('edit-look-product-search');
+  const resultsContainer = document.getElementById('edit-look-product-results');
+
+  if (!searchInput || !resultsContainer) return;
+
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (!query) {
+      resultsContainer.style.display = 'none';
+      return;
+    }
+
+    const matches = Object.entries(catalog).filter(([slug, item]) => {
+      const matchTitle = (item.title || '').toLowerCase().includes(query);
+      const matchSlug = slug.toLowerCase().includes(query);
+      return (matchTitle || matchSlug) && !editSelectedLookProducts.includes(slug);
+    });
+
+    if (matches.length === 0) {
+      resultsContainer.innerHTML = `<div class="search-result-item" style="color:#94a3b8;">Tidak ada produk cocok</div>`;
+    } else {
+      resultsContainer.innerHTML = matches.map(([slug, item]) => `
+        <div class="search-result-item" onclick="addEditLookProduct('${slug}')">
+          <img src="${item.image}" style="width:30px; height:40px; object-fit:cover; border-radius:3px;">
+          <div>
+            <strong>${item.title}</strong> <small style="color:#64748b;">(${slug})</small>
+          </div>
+        </div>
+      `).join('');
+    }
+    resultsContainer.style.display = 'block';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+      resultsContainer.style.display = 'none';
+    }
+  });
+}
+
+function addEditLookProduct(slug) {
+  if (!editSelectedLookProducts.includes(slug)) {
+    editSelectedLookProducts.push(slug);
+    renderEditLookProductChips();
+  }
+  document.getElementById('edit-look-product-search').value = '';
+  document.getElementById('edit-look-product-results').style.display = 'none';
+}
+
+function removeEditLookProduct(slug) {
+  editSelectedLookProducts = editSelectedLookProducts.filter(s => s !== slug);
+  renderEditLookProductChips();
+}
+
+function renderEditLookProductChips() {
+  const container = document.getElementById('edit-selected-products-container');
+  if (!container) return;
+
+  if (editSelectedLookProducts.length === 0) {
+    container.innerHTML = `<span style="color:#94a3b8; font-size:12px;">Belum ada produk terhubung.</span>`;
+    return;
+  }
+
+  container.innerHTML = editSelectedLookProducts.map(slug => {
+    const item = catalog[slug] || { title: slug };
+    return `
+      <div class="product-chip">
+        <span>${item.title}</span>
+        <button type="button" class="product-chip-remove" onclick="removeEditLookProduct('${slug}')">&times;</button>
+      </div>
+    `;
+  }).join('');
 }
 
 // Render Dropdown Collections di Form Look
 function renderCollectionsDropdown() {
-  const select = document.getElementById('look-collection-select');
+  const selects = [
+    document.getElementById('look-collection-select'),
+    document.getElementById('edit-look-collection-select')
+  ];
   const items = Object.entries(collections);
 
-  select.innerHTML = '<option value="">-- Tanpa Koleksi Utama --</option>' + 
-    items.map(([colId, col]) => `<option value="${colId}">${col.title}</option>`).join('');
+  selects.forEach(select => {
+    if (!select) return;
+    select.innerHTML = '<option value="">-- Pilih Koleksi --</option>' + 
+      items.map(([colId, col]) => `<option value="${colId}">${col.title}</option>`).join('');
+  });
 }
 
 // SIMPAN CURATED LOOK BARU
@@ -406,9 +573,6 @@ async function saveNewLook() {
   const lookId = document.getElementById('look-id').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
   const title = document.getElementById('look-title').value.trim();
   const collectionId = document.getElementById('look-collection-select').value;
-  
-  const selectedCheckboxes = document.querySelectorAll('input[name="look_product"]:checked');
-  const productSlugs = Array.from(selectedCheckboxes).map(cb => cb.value);
 
   if (!lookId || !title) {
     alert("ID Look dan Judul Look wajib diisi!");
@@ -428,7 +592,7 @@ async function saveNewLook() {
       title: title,
       collection_id: collectionId || "",
       hero_image: lookBase64Image,
-      product_slugs: productSlugs
+      product_slugs: selectedLookProducts
     }
   };
 
@@ -446,6 +610,8 @@ async function saveNewLook() {
       document.getElementById('look-image-file').value = '';
       document.getElementById('look-image-preview').style.display = 'none';
       lookBase64Image = "";
+      selectedLookProducts = [];
+      renderLookProductChips();
       loadLooks();
     } else {
       alert("Gagal menyimpan Look.");
@@ -474,19 +640,125 @@ function renderLooksTable(data) {
       <td><span style="font-size:11px; padding:2px 6px; background:#e2e8f0; border-radius:4px;">${look.collection_id || '-'}</span></td>
       <td>${(look.product_slugs || []).length} Item</td>
       <td>
-        <button class="btn btn-copy" onclick="copyLinkText('${origin}/look/${look.id}', 'Link SSR Pinterest Look')">
-          Copy Link Pinterest
-        </button>
+        <div class="action-group">
+          <button class="btn btn-copy" onclick="copyLinkText('${origin}/look/${look.id}', 'Link Pinterest Look')">
+            Copy
+          </button>
+          <button class="btn btn-edit" onclick="openEditLookModal('${look.id}')">
+            Edit
+          </button>
+          <button class="btn btn-danger" onclick="deleteLook('${look.id}')">
+            Hapus
+          </button>
+        </div>
       </td>
     </tr>
   `).join('');
 }
+
+// SEARCH FILTER TABLE LOOKS
+document.getElementById('search-looks-table')?.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  const filtered = {};
+
+  Object.entries(looks).forEach(([id, item]) => {
+    const matchTitle = (item.title || '').toLowerCase().includes(query);
+    const matchId = id.toLowerCase().includes(query);
+    const matchCol = (item.collection_id || '').toLowerCase().includes(query);
+    if (matchTitle || matchId || matchCol) {
+      filtered[id] = item;
+    }
+  });
+
+  renderLooksTable(filtered);
+});
+
+// MODAL EDIT LOOK
+function openEditLookModal(id) {
+  const item = looks[id];
+  if (!item) return;
+
+  document.getElementById('edit-look-old-id').value = id;
+  document.getElementById('edit-look-id').value = id;
+  document.getElementById('edit-look-title').value = item.title || '';
+  document.getElementById('edit-look-collection-select').value = item.collection_id || '';
+  document.getElementById('edit-look-preview-img').src = item.hero_image;
+  editLookBase64Image = item.hero_image;
+
+  editSelectedLookProducts = [...(item.product_slugs || [])];
+  renderEditLookProductChips();
+
+  document.getElementById('edit-look-modal').classList.add('active');
+}
+
+function closeEditLookModal() {
+  document.getElementById('edit-look-modal').classList.remove('active');
+  document.getElementById('edit-look-image-file').value = '';
+}
+
+async function submitLookEdit() {
+  const id = document.getElementById('edit-look-id').value;
+  const title = document.getElementById('edit-look-title').value.trim();
+  const collectionId = document.getElementById('edit-look-collection-select').value;
+
+  if (!title) {
+    alert("Judul Look wajib diisi!");
+    return;
+  }
+
+  const payload = {
+    target: "looks",
+    id: id,
+    data: {
+      id: id,
+      title: title,
+      collection_id: collectionId || "",
+      hero_image: editLookBase64Image,
+      product_slugs: editSelectedLookProducts
+    }
+  };
+
+  try {
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      alert("Look berhasil diperbarui!");
+      closeEditLookModal();
+      loadLooks();
+    } else {
+      alert("Gagal memperbarui Look.");
+    }
+  } catch (err) {
+    alert("Terjadi kesalahan jaringan.");
+  }
+}
+
+async function deleteLook(id) {
+  if (!confirm(`Yakin ingin menghapus Look ${id}?`)) return;
+
+  const res = await fetch('/api/products/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+    body: JSON.stringify({ slug: id, target: 'looks' })
+  });
+
+  if (res.ok) loadLooks();
+}
+
+// ==========================================
+// LOGIKA COLLECTIONS (UTAMA & FEATURED)
+// ==========================================
 
 // SIMPAN COLLECTION UTAMA BARU
 async function saveNewCollection() {
   const colId = document.getElementById('col-id').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
   const title = document.getElementById('col-title').value.trim();
   const description = document.getElementById('col-desc').value.trim();
+  const isFeatured = document.getElementById('col-is-featured').checked;
 
   if (!colId || !title) {
     alert("ID Koleksi dan Nama Koleksi wajib diisi!");
@@ -499,7 +771,8 @@ async function saveNewCollection() {
     data: {
       id: colId,
       title: title,
-      description: description
+      description: description,
+      is_featured: isFeatured
     }
   };
 
@@ -515,6 +788,7 @@ async function saveNewCollection() {
       document.getElementById('col-id').value = '';
       document.getElementById('col-title').value = '';
       document.getElementById('col-desc').value = '';
+      document.getElementById('col-is-featured').checked = true;
       loadCollections();
     } else {
       alert("Gagal menyimpan Koleksi.");
@@ -530,7 +804,7 @@ function renderCollectionsTable(data) {
   const items = Object.entries(data);
 
   if (items.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Koleksi Utama.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Koleksi Utama.</td></tr>`;
     return;
   }
 
@@ -539,9 +813,106 @@ function renderCollectionsTable(data) {
       <td><strong>${col.id}</strong></td>
       <td>${col.title}</td>
       <td><small style="color:#64748b;">${col.description || '-'}</small></td>
-      <td><span style="font-size:12px; color:#10b981;">Aktif</span></td>
+      <td>
+        ${col.is_featured !== false 
+          ? `<span class="badge badge-featured">⭐ Featured Slider</span>` 
+          : `<span class="badge badge-inactive">Standard</span>`}
+      </td>
+      <td>
+        <div class="action-group">
+          <button class="btn btn-edit" onclick="openEditColModal('${col.id}')">Edit</button>
+          <button class="btn btn-danger" onclick="deleteCol('${col.id}')">Hapus</button>
+        </div>
+      </td>
     </tr>
   `).join('');
+}
+
+// SEARCH FILTER TABLE COLLECTIONS
+document.getElementById('search-collections-table')?.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  const filtered = {};
+
+  Object.entries(collections).forEach(([id, item]) => {
+    const matchTitle = (item.title || '').toLowerCase().includes(query);
+    const matchId = id.toLowerCase().includes(query);
+    if (matchTitle || matchId) {
+      filtered[id] = item;
+    }
+  });
+
+  renderCollectionsTable(filtered);
+});
+
+// MODAL EDIT COLLECTION
+function openEditColModal(id) {
+  const item = collections[id];
+  if (!item) return;
+
+  document.getElementById('edit-col-old-id').value = id;
+  document.getElementById('edit-col-id').value = id;
+  document.getElementById('edit-col-title').value = item.title || '';
+  document.getElementById('edit-col-desc').value = item.description || '';
+  document.getElementById('edit-col-is-featured').checked = item.is_featured !== false;
+
+  document.getElementById('edit-col-modal').classList.add('active');
+}
+
+function closeEditColModal() {
+  document.getElementById('edit-col-modal').classList.remove('active');
+}
+
+async function submitColEdit() {
+  const id = document.getElementById('edit-col-id').value;
+  const title = document.getElementById('edit-col-title').value.trim();
+  const description = document.getElementById('edit-col-desc').value.trim();
+  const isFeatured = document.getElementById('edit-col-is-featured').checked;
+
+  if (!title) {
+    alert("Nama Koleksi wajib diisi!");
+    return;
+  }
+
+  const payload = {
+    target: "collections",
+    id: id,
+    data: {
+      id: id,
+      title: title,
+      description: description,
+      is_featured: isFeatured
+    }
+  };
+
+  try {
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      alert("Koleksi Utama berhasil diperbarui!");
+      closeEditColModal();
+      loadCollections();
+    } else {
+      alert("Gagal memperbarui Koleksi.");
+    }
+  } catch (err) {
+    alert("Terjadi kesalahan jaringan.");
+  }
+}
+
+async function deleteCol(id) {
+  if (!confirm(`Yakin ingin menghapus Koleksi Utama ${id}?`)) return;
+
+  const res = await fetch('/api/products/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+    body: JSON.stringify({ slug: id, target: 'collections' })
+  });
+
+  if (res.ok) loadCollections();
 }
 
 // Jalankan Inisialisasi Awal

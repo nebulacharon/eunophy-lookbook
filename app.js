@@ -438,7 +438,6 @@ function checkDirectUrlLook() {
   if (path.startsWith('/look/')) {
     const rawLookId = path.split('/look/')[1];
     if (rawLookId) {
-      // Buka modal secara aman begitu data selesai dimuat
       openLookDetailModal(rawLookId);
     }
   }
