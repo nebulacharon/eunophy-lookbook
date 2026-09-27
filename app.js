@@ -131,11 +131,15 @@ function applyFilterAndRender() {
 }
 
 // Render Grid / Slider Curated Looks
-// Helper untuk memicu ulang animasi CSS
+// Helper Animasi Mulus & Soft
 function triggerGridAnimation(container) {
+  // Hapus class lama
   container.classList.remove('fade-in-content');
-  void container.offsetWidth; // Force reflow agar animasi teriset
-  container.classList.add('fade-in-content');
+  
+  // Memicu animasi secara smooth
+  requestAnimationFrame(() => {
+    container.classList.add('fade-in-content');
+  });
 }
 
 // Render Grid / Slider Curated Looks
