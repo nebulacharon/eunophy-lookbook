@@ -41,6 +41,7 @@ export async function onRequestGet(context) {
   
     <!-- Gunakan Absolute Path '/' agar CSS tidak Not Found -->
     <link rel="stylesheet" href="/style.css">
+    <script src="/app.js"></script>
   </head>
   <body>
   

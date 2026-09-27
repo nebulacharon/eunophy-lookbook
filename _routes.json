@@ -1,0 +1,18 @@
+{
+    "version": 1,
+    "include": [
+      "/functions/*"
+    ],
+    "exclude": [
+      "/style.css",
+      "/app.js",
+      "/admin.js",
+      "/admin.html",
+      "/assets/*",
+      "/*.png",
+      "/*.jpg",
+      "/*.jpeg",
+      "/*.svg",
+      "/*.ico"
+    ]
+  }
