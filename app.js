@@ -10,7 +10,7 @@ let currentCollection = 'all';
 const searchInput = document.getElementById('search-input');
 const hero = document.querySelector('.hero-section');
 
-// --- Helper untuk membersihkan Judul dari Kode ganda ---
+// Helper untuk membersihkan Judul dari Kode ganda
 function cleanTitle(title, code) {
   if (!title) return '';
   if (!code) return title;
@@ -18,7 +18,7 @@ function cleanTitle(title, code) {
   return title.replace(reg, '').trim();
 }
 
-// --- 1. INISIALISASI & AMBIL DATA DARI KV ---
+// 1. INISIALISASI & AMBIL DATA
 async function initApp() {
   const container = document.getElementById('grid-container');
   try {
@@ -42,7 +42,7 @@ async function initApp() {
   }
 }
 
-// --- 2. SWITCH VIEW MODE (LOOKS VS CATALOG ITEMS) ---
+// 2. SWITCH VIEW MODE
 function switchViewMode(mode) {
   currentViewMode = mode;
 
@@ -60,7 +60,7 @@ function switchViewMode(mode) {
   applyFilterAndRender();
 }
 
-// --- 3. RENDER COLLECTIONS CHIP BAR ---
+// 3. RENDER COLLECTIONS BAR
 function renderCollectionsBar() {
   const bar = document.getElementById('collections-bar');
   if (!bar) return;
@@ -85,7 +85,7 @@ function selectCollection(colId) {
   applyFilterAndRender();
 }
 
-// --- 4. LOGIKA FILTER UNIVERSAL & RENDER GRID ---
+// 4. LOGIKA FILTER & RENDER GRID
 function applyFilterAndRender() {
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
@@ -98,7 +98,7 @@ function applyFilterAndRender() {
   }
 }
 
-// A. Render Grid Curated Looks (Koleksi Gabungan)
+// A. Render Grid Curated Looks (Koleksi LK-XXXX)
 function renderLooksGrid() {
   const container = document.getElementById('grid-container');
   if (!container) return;
@@ -124,22 +124,20 @@ function renderLooksGrid() {
         <div class="img-container">
           <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
           <div class="overlay-info">
-            <span class="overlay-code" style="font-family: system-ui, -apple-system, sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase;">${lookCode}</span>
+            <span class="overlay-code">${lookCode}</span>
             <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-          <span style="font-family:'Cormorant Garamond', serif; font-size:15px; font-weight:600; color:#0f172a; line-height:1.2;">
-            <strong style="font-family: system-ui, -apple-system, sans-serif; font-size:12px; color:#334155; margin-right:4px;">${lookCode}</strong> ${lookTitle}
-          </span>
-          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8;">${itemCount} Items</span>
+        <div class="card-bottom">
+          <span class="product-title">${lookTitle}</span>
+          <span class="category-tag">${itemCount} Items</span>
         </div>
       </div>
     `;
   }).join('');
 }
 
-// B. Render Grid Catalog Items (Single Item - EUN-XXXX)
+// B. Render Grid Catalog Items (Single Product EUN-XXXX)
 function renderCatalogGrid() {
   const container = document.getElementById('grid-container');
   if (!container) return;
@@ -167,28 +165,24 @@ function renderCatalogGrid() {
     const itemTitle = cleanTitle(item.title, itemCode);
 
     return `
-      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer">
         <div class="img-container">
           <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
           <div class="overlay-info">
-            <!-- Font Sans-Serif Tegas Sesuai Tanda Merah -->
-            <span class="overlay-code" style="font-family: system-ui, -apple-system, sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase;">${itemCode}</span>
+            <span class="overlay-code">${itemCode}</span>
             <span class="overlay-action">Klik untuk beli di Shopee ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-          <!-- Menggabungkan Kode + Nama Produk dalam 1 Baris Tunggal -->
-          <span style="font-family:'Cormorant Garamond', serif; font-size:15px; font-weight:600; color:#0f172a; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-            <strong style="font-family: system-ui, -apple-system, sans-serif; font-size:12px; color:#334155; margin-right:4px;">${itemCode}</strong> ${itemTitle}
-          </span>
-          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8; text-transform:capitalize; margin-left:8px;">${item.category || item.segment || 'Item'}</span>
+        <div class="card-bottom">
+          <span class="product-title">${itemTitle}</span>
+          <span class="category-tag">${item.category || item.segment || 'Item'}</span>
         </div>
       </a>
     `;
   }).join('');
 }
 
-// C. Pencarian Cerdas Global
+// C. Pencarian Global
 function renderGlobalSearchResults(query) {
   const container = document.getElementById('grid-container');
   if (!container) return;
@@ -220,7 +214,6 @@ function renderGlobalSearchResults(query) {
 
   let html = '';
 
-  // Render Hasil Looks
   matchedLooks.forEach(look => {
     const itemCount = (look.product_slugs || []).length;
     const lookCode = (look.id || '').toUpperCase();
@@ -228,44 +221,39 @@ function renderGlobalSearchResults(query) {
 
     html += `
       <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
-        <div class="img-container" style="position:relative;">
+        <div class="img-container">
           <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <span style="position:absolute; top:8px; right:8px; background:#0f172a; color:#fff; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">LOOK / COLLECTION</span>
+          <span style="position:absolute; top:8px; right:8px; background:#0f172a; color:#fff; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">LOOK</span>
           <div class="overlay-info">
-            <span class="overlay-code" style="font-family: system-ui, -apple-system, sans-serif; font-weight: 700; font-size: 13px;">${lookCode}</span>
+            <span class="overlay-code">${lookCode}</span>
             <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-          <span style="font-family:'Cormorant Garamond', serif; font-size:15px; font-weight:600; color:#0f172a;">
-            <strong style="font-family: system-ui, -apple-system, sans-serif; font-size:12px; color:#334155; margin-right:4px;">${lookCode}</strong> ${lookTitle}
-          </span>
-          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8;">${itemCount} Items</span>
+        <div class="card-bottom">
+          <span class="product-title">${lookTitle}</span>
+          <span class="category-tag">${itemCount} Items</span>
         </div>
       </div>
     `;
   });
 
-  // Render Hasil Catalog Items
   matchedCatalog.forEach(([slug, item]) => {
     const itemCode = (item.id || slug).toUpperCase();
     const itemTitle = cleanTitle(item.title, itemCode);
 
     html += `
-      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
-        <div class="img-container" style="position:relative;">
+      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer">
+        <div class="img-container">
           <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <span style="position:absolute; top:8px; right:8px; background:#e2e8f0; color:#1e293b; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">SINGLE ITEM</span>
+          <span style="position:absolute; top:8px; right:8px; background:#e2e8f0; color:#1e293b; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">ITEM</span>
           <div class="overlay-info">
-            <span class="overlay-code" style="font-family: system-ui, -apple-system, sans-serif; font-weight: 700; font-size: 13px;">${itemCode}</span>
+            <span class="overlay-code">${itemCode}</span>
             <span class="overlay-action">Klik untuk beli di Shopee ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-          <span style="font-family:'Cormorant Garamond', serif; font-size:15px; font-weight:600; color:#0f172a;">
-            <strong style="font-family: system-ui, -apple-system, sans-serif; font-size:12px; color:#334155; margin-right:4px;">${itemCode}</strong> ${itemTitle}
-          </span>
-          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8; text-transform:capitalize;">${item.category || item.segment || 'Item'}</span>
+        <div class="card-bottom">
+          <span class="product-title">${itemTitle}</span>
+          <span class="category-tag">${item.category || item.segment || 'Item'}</span>
         </div>
       </a>
     `;
@@ -274,7 +262,7 @@ function renderGlobalSearchResults(query) {
   container.innerHTML = html;
 }
 
-// --- 5. MODAL POPUP DETAIL LOOK ---
+// 5. MODAL DETAIL LOOK
 function openLookDetailModal(lookId) {
   const look = allLooks[lookId];
   if (!look) return;
@@ -309,7 +297,6 @@ function openLookDetailModal(lookId) {
     <div class="modal-body-scrollable" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-height: 75vh; overflow-y: auto; padding-bottom: 40px;">
       <div style="position: relative;">
         <img src="${look.hero_image}" alt="${lookTitle}" style="width:100%; border-radius:8px; object-fit:cover; display:block;">
-        
         <div id="mobile-hint-scroll" class="mobile-scroll-floating-hint">
           Scroll kebawah untuk melihat items ↓
         </div>
@@ -317,7 +304,6 @@ function openLookDetailModal(lookId) {
 
       <div>
         <h4 style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 12px;">Items in this look:</h4>
-        
         <div style="display: flex; flex-direction: column; gap: 12px;">
           ${attachedProducts.length === 0 ? '<p style="font-size:12px; color:#94a3b8;">Belum ada item terhubung.</p>' : ''}
           ${attachedProducts.map(prod => {
@@ -346,7 +332,6 @@ function openLookDetailModal(lookId) {
 
   const scrollableContainer = body.querySelector('.modal-body-scrollable');
   const hintEl = body.querySelector('#mobile-hint-scroll');
-  
   if (scrollableContainer && hintEl) {
     scrollableContainer.addEventListener('scroll', () => {
       if (scrollableContainer.scrollTop > 20) {
@@ -360,7 +345,6 @@ function openLookDetailModal(lookId) {
 function closeDetailModal() {
   const modal = document.getElementById('detail-modal');
   if (modal) modal.classList.remove('active');
-  
   document.body.classList.remove('no-scroll');
 
   if (window.location.pathname.startsWith('/look/')) {
@@ -370,7 +354,6 @@ function closeDetailModal() {
 
 async function shareLookLink(lookId, lookTitle) {
   const shareUrl = `${window.location.origin}/look/${lookId}`;
-  
   if (navigator.share) {
     try {
       await navigator.share({
@@ -378,9 +361,7 @@ async function shareLookLink(lookId, lookTitle) {
         text: `Lihat inspirasi outfit "${lookTitle || 'Look'}" di Eunophy:`,
         url: shareUrl
       });
-    } catch (err) {
-      // User membatalkan dialog share
-    }
+    } catch (err) {}
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(shareUrl).then(() => {
       alert("Link look berhasil disalin ke clipboard!");
@@ -402,9 +383,7 @@ function checkDirectUrlLook() {
 
 window.addEventListener('click', (e) => {
   const modal = document.getElementById('detail-modal');
-  if (e.target === modal) {
-    closeDetailModal();
-  }
+  if (e.target === modal) closeDetailModal();
 });
 
 document.addEventListener('click', (e) => {
@@ -413,7 +392,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// --- 6. EVENT LISTENERS CATEGORY & SEARCH ---
+// 6. EVENT LISTENERS CATEGORY & SEARCH
 document.querySelectorAll('.cat-pill').forEach((btn) => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.cat-pill').forEach((b) => b.classList.remove('active'));
@@ -445,5 +424,4 @@ if (searchInput) {
   });
 }
 
-// Inisialisasi Aplikasi
 initApp();
