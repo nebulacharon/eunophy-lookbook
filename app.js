@@ -302,12 +302,24 @@ function renderGlobalSearchResults(query) {
 
 // 5. MODAL DETAIL LOOK
 function openLookDetailModal(lookId) {
+  console.log("1. Menerima lookId:", lookId);
+  console.log("2. Isi allLooks:", allLooks);
+
   const look = allLooks[lookId];
-  if (!look) return;
+  console.log("3. Data look ditemukan:", look);
+
+  if (!look) {
+    console.error("GAGAL: Data look tidak ditemukan di allLooks!");
+    return;
+  }
 
   const modal = document.getElementById('detail-modal');
   const body = document.getElementById('modal-content-body');
-  if (!modal || !body) return;
+  
+  if (!modal || !body) {
+    console.error("GAGAL: Elemen #detail-modal atau #modal-content-body tidak ada di HTML!");
+    return;
+  }
 
   document.body.classList.add('no-scroll');
 
