@@ -259,6 +259,9 @@ function renderCatalogGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
+  // Wajib tambahkan ini untuk mereset layout menjadi grid biasa
+  container.className = 'lookbook-grid';
+
   let itemsList = Object.entries(allCatalog);
 
   if (currentSegment !== 'all') {
