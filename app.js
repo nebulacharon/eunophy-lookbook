@@ -38,7 +38,6 @@ async function initApp() {
 function switchViewMode(mode) {
   currentViewMode = mode;
 
-  // Toggle kelas tombol UI switcher
   const btnLooks = document.getElementById('btn-view-looks');
   const btnCatalog = document.getElementById('btn-view-catalog');
   const catNav = document.getElementById('category-nav');
@@ -47,12 +46,10 @@ function switchViewMode(mode) {
   if (btnLooks) btnLooks.classList.toggle('active', mode === 'looks');
   if (btnCatalog) btnCatalog.classList.toggle('active', mode === 'catalog');
 
-  // Kategori segmen (Tops, Bottoms, dll.) hanya ditampilkan saat mode 'catalog'
   if (catNav) {
     catNav.style.display = (mode === 'catalog') ? 'flex' : 'none';
   }
 
-  // Chip Koleksi hanya dikhususkan saat mode 'looks'
   if (colBar) {
     colBar.style.display = (mode === 'looks') ? 'flex' : 'none';
   }
@@ -89,7 +86,6 @@ function selectCollection(colId) {
 function applyFilterAndRender() {
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-  // Jika user mengetikkan kata kunci pencarian, gunakan Smart Global Search
   if (query.length > 0) {
     renderGlobalSearchResults(query);
   } else if (currentViewMode === 'looks') {
@@ -106,7 +102,6 @@ function renderLooksGrid(query) {
 
   let looksList = Object.values(allLooks);
 
-  // Filter berdasarkan Koleksi (Collection ID)
   if (currentCollection !== 'all') {
     looksList = looksList.filter(look => look.collection_id === currentCollection);
   }
@@ -120,19 +115,16 @@ function renderLooksGrid(query) {
     const itemCount = (look.product_slugs || []).length;
     const lookCode = (look.id || '').toUpperCase();
     return `
-      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer; position:relative;">
-        <div class="img-container" style="position:relative;">
+      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
+        <div class="img-container">
           <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <span class="look-code-badge" style="position:absolute; top:8px; left:8px; background:rgba(0,0,0,0.65); color:#fff; font-size:11px; padding:3px 7px; border-radius:4px; font-weight:600;">${lookCode}</span>
           <div class="overlay-info">
-            <span class="overlay-code">${look.title}</span>
-            <span class="overlay-action">
-              Lihat ${itemCount} Style Items ↗
-            </span>
+            <span class="overlay-code">${lookCode} - ${look.title}</span>
+            <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
           </div>
         </div>
-        <div class="card-bottom">
-          <span class="product-code">${look.title}</span>
+        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="product-code"><strong>${lookCode}</strong> ${look.title}</span>
           <span class="category-tag">${itemCount} Items Outfit</span>
         </div>
       </div>
@@ -179,8 +171,8 @@ function renderCatalogGrid(query) {
           </span>
         </div>
       </div>
-      <div class="card-bottom">
-        <span class="product-code">${item.title}</span>
+      <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="product-code"><strong>${(item.id || slug).toUpperCase()}</strong> ${item.title}</span>
         <span class="category-tag">${item.category || 'Lookbook'}</span>
       </div>
     </a>
@@ -192,7 +184,6 @@ function renderGlobalSearchResults(query) {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
-  // Search di Curated Looks
   const matchedLooks = Object.values(allLooks).filter(look => {
     const matchTitle = (look.title || '').toLowerCase().includes(query);
     const matchId = (look.id || '').toLowerCase().includes(query);
@@ -206,7 +197,6 @@ function renderGlobalSearchResults(query) {
     return matchTitle || matchId || matchCol || matchProduct;
   });
 
-  // Search di Catalog Items
   const matchedCatalog = Object.entries(allCatalog).filter(([slug, item]) => {
     const matchTitle = (item.title || '').toLowerCase().includes(query);
     const matchSubCat = (item.category || '').toLowerCase().includes(query);
@@ -226,18 +216,17 @@ function renderGlobalSearchResults(query) {
     const itemCount = (look.product_slugs || []).length;
     const lookCode = (look.id || '').toUpperCase();
     html += `
-      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer; position:relative;">
+      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
         <div class="img-container" style="position:relative;">
           <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <span style="position:absolute; top:8px; right:8px; background:#0f172a; color:#fff; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px;">LOOK / COLLECTION</span>
-          <span class="look-code-badge" style="position:absolute; top:8px; left:8px; background:rgba(0,0,0,0.65); color:#fff; font-size:11px; padding:3px 7px; border-radius:4px; font-weight:600;">${lookCode}</span>
+          <span style="position:absolute; top:8px; right:8px; background:#0f172a; color:#fff; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">LOOK / COLLECTION</span>
           <div class="overlay-info">
-            <span class="overlay-code">${look.title}</span>
+            <span class="overlay-code">${lookCode} - ${look.title}</span>
             <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
           </div>
         </div>
-        <div class="card-bottom">
-          <span class="product-code">${look.title}</span>
+        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="product-code"><strong>${lookCode}</strong> ${look.title}</span>
           <span class="category-tag">${itemCount} Items Outfit</span>
         </div>
       </div>
@@ -246,18 +235,19 @@ function renderGlobalSearchResults(query) {
 
   // Render Hasil Catalog Items
   matchedCatalog.forEach(([slug, item]) => {
+    const itemCode = (item.id || slug).toUpperCase();
     html += `
-      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer" style="position:relative;">
+      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer">
         <div class="img-container" style="position:relative;">
           <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <span style="position:absolute; top:8px; right:8px; background:#e2e8f0; color:#1e293b; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px;">SINGLE ITEM</span>
+          <span style="position:absolute; top:8px; right:8px; background:#e2e8f0; color:#1e293b; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">SINGLE ITEM</span>
           <div class="overlay-info">
             <span class="overlay-code">${item.title}</span>
             <span class="overlay-action">Klik untuk beli di Shopee ↗</span>
           </div>
         </div>
-        <div class="card-bottom">
-          <span class="product-code">${item.title}</span>
+        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="product-code"><strong>${itemCode}</strong> ${item.title}</span>
           <span class="category-tag">${item.category || 'Lookbook'}</span>
         </div>
       </a>
@@ -267,7 +257,7 @@ function renderGlobalSearchResults(query) {
   container.innerHTML = html;
 }
 
-// --- 5. MODAL POPUP DETAIL LOOK (DESAIN UNIFIED FIX) ---
+// --- 5. MODAL POPUP DETAIL LOOK ---
 function openLookDetailModal(lookId) {
   const look = allLooks[lookId];
   if (!look) return;
@@ -281,28 +271,31 @@ function openLookDetailModal(lookId) {
     .filter(Boolean);
 
   body.innerHTML = `
-    <!-- Header Modal (Judul, ID, Share, Close) -->
-    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
-      <div>
-        <h2 style="font-family:'Cormorant Garamond', serif; font-size: 24px; margin: 0; color:#0f172a;">${look.title}</h2>
-        <span style="font-size: 12px; color: #64748b;">ID Style: ${(look.id || '').toUpperCase()}</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <button onclick="shareLookLink('${look.id}')" style="display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #cbd5e0; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;">
+    <!-- Header Modal (Single Close Button & Responsive Layout) -->
+    <div style="position: relative; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
+      <button onclick="closeDetailModal()" class="modal-close-btn" style="position: absolute; right: 0; top: -4px; background: none; border: none; font-size: 26px; cursor: pointer; color: #64748b; line-height: 1; padding: 4px;">×</button>
+      
+      <h2 style="font-family:'Cormorant Garamond', serif; font-size: 24px; margin: 0 32px 6px 0; color:#0f172a; line-height: 1.2;">${look.title}</h2>
+      
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+        <span style="font-size: 12px; color: #64748b; font-weight: 500;">ID Style: ${(look.id || '').toUpperCase()}</span>
+        
+        <button onclick="shareLookLink('${look.id}', '${look.title}')" class="btn-share-native" style="display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #cbd5e0; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: 500; color: #334155;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           Bagikan
         </button>
-        <button onclick="closeDetailModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; padding: 0 4px;">×</button>
       </div>
     </div>
 
     <!-- Body Modal Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+    <div class="modal-body-scrollable" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-height: 75vh; overflow-y: auto;">
       <!-- Hero Image Wrapper -->
       <div style="position: relative;">
         <img src="${look.hero_image}" alt="${look.title}" style="width:100%; border-radius:8px; object-fit:cover; display:block;">
-        <div class="mobile-scroll-hint" style="text-align: center; margin-top: 8px; font-size: 11px; color: #64748b;">
-          Scroll ke bawah untuk melihat items ↓
+        
+        <!-- Animasi Hint Floating Scroll khusus Mobile -->
+        <div id="mobile-hint-scroll" class="mobile-scroll-floating-hint">
+          Scroll kebawah untuk melihat items ↓
         </div>
       </div>
 
@@ -310,7 +303,7 @@ function openLookDetailModal(lookId) {
       <div>
         <h4 style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 12px;">Items in this look:</h4>
         
-        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 360px; overflow-y: auto; padding-right: 4px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
           ${attachedProducts.length === 0 ? '<p style="font-size:12px; color:#94a3b8;">Belum ada item terhubung.</p>' : ''}
           ${attachedProducts.map(prod => `
             <div style="display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid #f1f5f9; border-radius: 8px; background: #fff;">
@@ -330,6 +323,19 @@ function openLookDetailModal(lookId) {
   `;
 
   modal.classList.add('active');
+
+  // Event Scroll Listener untuk menghilangkan petunjuk scroll di Mobile
+  const scrollableContainer = body.querySelector('.modal-body-scrollable');
+  const hintEl = body.querySelector('#mobile-hint-scroll');
+  
+  if (scrollableContainer && hintEl) {
+    scrollableContainer.addEventListener('scroll', () => {
+      if (scrollableContainer.scrollTop > 20) {
+        hintEl.style.opacity = '0';
+        setTimeout(() => { hintEl.style.display = 'none'; }, 300);
+      }
+    }, { once: true });
+  }
 }
 
 function closeDetailModal() {
@@ -341,12 +347,23 @@ function closeDetailModal() {
   }
 }
 
-// Salin Link Look
-function shareLookLink(lookId) {
+// Fitur Share Native Web Share API (WhatsApp, Telegram, System Share Sheet)
+async function shareLookLink(lookId, lookTitle) {
   const shareUrl = `${window.location.origin}/look/${lookId}`;
-  if (navigator.clipboard) {
+  
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: lookTitle || 'Eunophy Curated Look',
+        text: `Lihat inspirasi outfit "${lookTitle || 'Look'}" di Eunophy:`,
+        url: shareUrl
+      });
+    } catch (err) {
+      // User membatalkan dialog share
+    }
+  } else if (navigator.clipboard) {
     navigator.clipboard.writeText(shareUrl).then(() => {
-      alert("Link look berhasil disalin!");
+      alert("Link look berhasil disalin ke clipboard!");
     });
   } else {
     prompt("Salin link look berikut:", shareUrl);
@@ -373,7 +390,6 @@ window.addEventListener('click', (e) => {
 });
 
 // --- 6. EVENT LISTENERS ---
-// Event Listener Tab Kategori Pill (Segment)
 document.querySelectorAll('.cat-pill').forEach((btn) => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.cat-pill').forEach((b) => b.classList.remove('active'));
@@ -383,7 +399,6 @@ document.querySelectorAll('.cat-pill').forEach((btn) => {
   });
 });
 
-// Event Listener Search Realtime + Auto-Collapse Hero
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
