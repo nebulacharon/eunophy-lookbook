@@ -1,4 +1,4 @@
-// State Lokal Aplikasi (Aman dari redeklarasi ganda)
+// State Lokal Aplikasi
 var allCatalog = typeof allCatalog !== 'undefined' ? allCatalog : {};
 var allLooks = typeof allLooks !== 'undefined' ? allLooks : {};
 var allCollections = typeof allCollections !== 'undefined' ? allCollections : {};
@@ -7,7 +7,7 @@ var currentViewMode = typeof currentViewMode !== 'undefined' ? currentViewMode :
 var currentSegment = typeof currentSegment !== 'undefined' ? currentSegment : 'all';
 var currentCollection = typeof currentCollection !== 'undefined' ? currentCollection : 'all';
 
-// Element DOM Getter Helper (Menghindari null error saat load awal)
+// Element DOM Getter Helper
 function getSearchInput() { return document.getElementById('search-input'); }
 function getHero() { return document.querySelector('.hero-section'); }
 
@@ -29,6 +29,19 @@ function formatCode(rawCode) {
   return cleaned;
 }
 
+// Helper 3: Mencari Look Tanpa Terpengaruh Huruf Besar/Kecil (Case-Insensitive)
+function findLookById(targetId) {
+  if (!targetId || !allLooks) return null;
+  const cleanTarget = targetId.trim().toLowerCase();
+  
+  // Direct match
+  if (allLooks[targetId]) return allLooks[targetId];
+  
+  // Case-insensitive search
+  const foundKey = Object.keys(allLooks).find(key => key.toLowerCase() === cleanTarget);
+  return foundKey ? allLooks[foundKey] : null;
+}
+
 // 1. INISIALISASI & AMBIL DATA
 async function initApp() {
   const container = document.getElementById('grid-container');
@@ -45,6 +58,8 @@ async function initApp() {
 
     renderCollectionsBar();
     switchViewMode(currentViewMode);
+    
+    // Cek apakah user membuka via URL spesifik (e.g. /look/lk-0001)
     checkDirectUrlLook();
   } catch (err) {
     if (container) {
@@ -302,24 +317,17 @@ function renderGlobalSearchResults(query) {
 
 // 5. MODAL DETAIL LOOK
 function openLookDetailModal(lookId) {
-  console.log("1. Menerima lookId:", lookId);
-  console.log("2. Isi allLooks:", allLooks);
-
-  const look = allLooks[lookId];
-  console.log("3. Data look ditemukan:", look);
+  const look = findLookById(lookId);
 
   if (!look) {
-    console.error("GAGAL: Data look tidak ditemukan di allLooks!");
+    console.warn(`Look dengan ID '${lookId}' tidak ditemukan.`);
     return;
   }
 
   const modal = document.getElementById('detail-modal');
   const body = document.getElementById('modal-content-body');
   
-  if (!modal || !body) {
-    console.error("GAGAL: Elemen #detail-modal atau #modal-content-body tidak ada di HTML!");
-    return;
-  }
+  if (!modal || !body) return;
 
   document.body.classList.add('no-scroll');
 
@@ -378,7 +386,11 @@ function openLookDetailModal(lookId) {
   `;
 
   modal.classList.add('active');
-  window.history.pushState({}, '', `/look/${look.id}`);
+
+  // Hanya update URL jika saat ini tidak berada di URL spesifik look tersebut
+  if (window.location.pathname !== `/look/${look.id}`) {
+    window.history.pushState({}, '', `/look/${look.id}`);
+  }
 
   const scrollableContainer = body.querySelector('.modal-body-scrollable');
   const hintEl = body.querySelector('#mobile-hint-scroll');
@@ -424,9 +436,10 @@ async function shareLookLink(lookId, lookTitle) {
 function checkDirectUrlLook() {
   const path = window.location.pathname;
   if (path.startsWith('/look/')) {
-    const lookId = path.split('/look/')[1];
-    if (lookId && allLooks[lookId]) {
-      setTimeout(() => openLookDetailModal(lookId), 250);
+    const rawLookId = path.split('/look/')[1];
+    if (rawLookId) {
+      // Buka modal secara aman begitu data selesai dimuat
+      openLookDetailModal(rawLookId);
     }
   }
 }
