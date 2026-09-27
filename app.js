@@ -7,9 +7,9 @@ var currentViewMode = typeof currentViewMode !== 'undefined' ? currentViewMode :
 var currentSegment = typeof currentSegment !== 'undefined' ? currentSegment : 'all';
 var currentCollection = typeof currentCollection !== 'undefined' ? currentCollection : 'all';
 
-// Untuk elemen DOM, gunakan 'var' atau 'let' di dalam fungsi / inisialisasi
-var searchInput = document.getElementById('search-input');
-var hero = document.querySelector('.hero-section');
+// Element DOM Getter Helper (Menghindari null error saat load awal)
+function getSearchInput() { return document.getElementById('search-input'); }
+function getHero() { return document.querySelector('.hero-section'); }
 
 // Helper 1: Membersihkan Judul dari Kode Ganda
 function cleanTitle(title, code) {
@@ -19,7 +19,7 @@ function cleanTitle(title, code) {
   return title.replace(reg, '').trim();
 }
 
-// Helper 2: Menyisipkan Strip pada Kode Produk (Contoh: EUN0001 -> EUN-0001)
+// Helper 2: Menyisipkan Strip pada Kode Produk
 function formatCode(rawCode) {
   if (!rawCode) return '';
   const cleaned = rawCode.toUpperCase().trim();
@@ -60,17 +60,17 @@ function switchViewMode(mode) {
   const btnLooks = document.getElementById('btn-view-looks');
   const btnCatalog = document.getElementById('btn-view-catalog');
   const colBar = document.getElementById('collections-bar');
-  const catNav = document.querySelector('.category-nav');
+  const catNav = document.getElementById('category-nav');
 
   if (btnLooks) btnLooks.classList.toggle('active', mode === 'looks');
   if (btnCatalog) btnCatalog.classList.toggle('active', mode === 'catalog');
 
   if (mode === 'looks') {
     if (colBar) colBar.style.display = 'flex';
-    if (catNav) catNav.style.display = 'none'; // Sembunyikan kategori item di Curated Looks
+    if (catNav) catNav.style.display = 'none';
   } else {
     if (colBar) colBar.style.display = 'none';
-    if (catNav) catNav.style.display = 'flex'; // Tampilkan kategori item di All Items
+    if (catNav) catNav.style.display = 'flex';
   }
 
   applyFilterAndRender();
@@ -103,6 +103,7 @@ function selectCollection(colId) {
 
 // 4. LOGIKA FILTER & RENDER GRID
 function applyFilterAndRender() {
+  const searchInput = getSearchInput();
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
   if (query.length > 0) {
@@ -114,80 +115,26 @@ function applyFilterAndRender() {
   }
 }
 
-// A. Render Grid Curated Looks (Koleksi LK-XXXX)
-function renderLooksGrid() {
-  const container = document.getElementById('grid-container');
-  if (!container) return;
-
-  let looksList = Object.values(allLooks);
-
-  if (currentCollection !== 'all') {
-    looksList = looksList.filter(look => look.collection_id === currentCollection);
-  }
-
-  if (looksList.length === 0) {
-    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Belum ada Curated Look yang sesuai.</div>`;
-    return;
-  }
-
-  container.innerHTML = looksList.map(look => {
-    const itemCount = (look.product_slugs || []).length;
-    const lookCode = formatCode(look.id || '');
-    const lookTitle = cleanTitle(look.title, lookCode);
-
-    return `
-      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
-        <div class="img-container">
-          <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <div class="overlay-info">
-            <span class="overlay-code">${lookCode}</span>
-            <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <span class="product-title">${lookTitle}</span>
-          <span class="category-tag">${itemCount} Items</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-// LOGIKA FILTER & RENDER GRID DENGAN PENCARIAN TERFILTER (FIXED)
-function applyFilterAndRender() {
-  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-  if (currentViewMode === 'looks') {
-    renderLooksGrid(query);
-  } else {
-    renderCatalogGrid(query);
-  }
-}
-
-// A. Render Grid Curated Looks (Mengisi Tab Curated Looks)
+// A. Render Grid Curated Looks
 function renderLooksGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
   let looksList = Object.values(allLooks);
 
-  // Filter 1: Berdasarkan Koleksi
   if (currentCollection !== 'all') {
     looksList = looksList.filter(look => look.collection_id === currentCollection);
   }
 
-  // Filter 2: Berdasarkan Keyword Pencarian (Jika Ada)
   if (query.length > 0) {
     looksList = looksList.filter(look => {
       const matchTitle = (look.title || '').toLowerCase().includes(query);
       const matchId = (look.id || '').toLowerCase().includes(query);
       const matchCol = (look.collection_id || '').toLowerCase().includes(query);
-
       const matchProduct = (look.product_slugs || []).some(slug => {
         const prod = allCatalog[slug];
         return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
       });
-
       return matchTitle || matchId || matchCol || matchProduct;
     });
   }
@@ -221,14 +168,13 @@ function renderLooksGrid(query = '') {
   }).join('');
 }
 
-// B. Render Grid Catalog Items (Mengisi Tab All Items)
+// B. Render Grid Catalog Items
 function renderCatalogGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
   let itemsList = Object.entries(allCatalog);
 
-  // Filter 1: Berdasarkan Kategori Segment (Tops, Bottoms, dll.)
   if (currentSegment !== 'all') {
     itemsList = itemsList.filter(([slug, item]) => {
       const itemSegment = (item.segment || 'tops').toLowerCase();
@@ -236,7 +182,6 @@ function renderCatalogGrid(query = '') {
     });
   }
 
-  // Filter 2: Berdasarkan Keyword Pencarian (Jika Ada)
   if (query.length > 0) {
     itemsList = itemsList.filter(([slug, item]) => {
       const matchTitle = (item.title || '').toLowerCase().includes(query);
@@ -474,47 +419,52 @@ function checkDirectUrlLook() {
   }
 }
 
-window.addEventListener('click', (e) => {
-  const modal = document.getElementById('detail-modal');
-  if (e.target === modal) closeDetailModal();
-});
-
-document.addEventListener('click', (e) => {
-  if (e.target.matches('.modal-close, .close-btn, #modal-close')) {
-    closeDetailModal();
-  }
-});
-
-// 6. EVENT LISTENERS CATEGORY & SEARCH
-document.querySelectorAll('.cat-pill').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    document.querySelectorAll('.cat-pill').forEach((b) => b.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    currentSegment = e.currentTarget.dataset.segment;
-    applyFilterAndRender();
+// Setup Event Listeners Setelah DOM Terisi
+document.addEventListener('DOMContentLoaded', () => {
+  window.addEventListener('click', (e) => {
+    const modal = document.getElementById('detail-modal');
+    if (e.target === modal) closeDetailModal();
   });
-});
 
-if (searchInput) {
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
-
-    if (hero) {
-      if (query.length > 0) {
-        hero.classList.add('hidden-search');
-        if (currentSegment !== 'all') {
-          currentSegment = 'all';
-          document.querySelectorAll('.cat-pill').forEach((b) => {
-            b.classList.toggle('active', b.dataset.segment === 'all');
-          });
-        }
-      } else {
-        hero.classList.remove('hidden-search');
-      }
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('.modal-close, .close-btn, #modal-close')) {
+      closeDetailModal();
     }
-
-    applyFilterAndRender();
   });
-}
 
-initApp();
+  document.querySelectorAll('.cat-pill').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.cat-pill').forEach((b) => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      currentSegment = e.currentTarget.dataset.segment;
+      applyFilterAndRender();
+    });
+  });
+
+  const searchInput = getSearchInput();
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const hero = getHero();
+
+      if (hero) {
+        if (query.length > 0) {
+          hero.classList.add('hidden-search');
+          if (currentSegment !== 'all') {
+            currentSegment = 'all';
+            document.querySelectorAll('.cat-pill').forEach((b) => {
+              b.classList.toggle('active', b.dataset.segment === 'all');
+            });
+          }
+        } else {
+          hero.classList.remove('hidden-search');
+        }
+      }
+
+      applyFilterAndRender();
+    });
+  }
+
+  // Jalankan Inisialisasi Utama
+  initApp();
+});
