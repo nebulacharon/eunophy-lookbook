@@ -117,17 +117,53 @@ function selectCollection(colId) {
 }
 
 // 4. LOGIKA FILTER & RENDER GRID
+// 4. LOGIKA FILTER & RENDER GRID
 function applyFilterAndRender() {
   const searchInput = getSearchInput();
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
   if (query.length > 0) {
-    renderGlobalSearchResults(query);
+    // Jalankan pencarian sesuai dengan mode view yang sedang aktif
+    if (currentViewMode === 'looks') {
+      renderLooksSearch(query);
+    } else {
+      renderCatalogGrid(query);
+    }
   } else if (currentViewMode === 'looks') {
     renderLooksGrid();
   } else {
     renderCatalogGrid();
   }
+}
+
+// Helper khusus untuk menangani pencarian khusus di tab Curated Looks
+function renderLooksSearch(query) {
+  const container = document.getElementById('grid-container');
+  if (!container) return;
+
+  container.className = 'lookbook-grid';
+
+  const matchedLooks = Object.values(allLooks).filter(look => {
+    const matchTitle = (look.title || '').toLowerCase().includes(query);
+    const matchId = (look.id || '').toLowerCase().includes(query);
+    const matchCol = (look.collection_id || '').toLowerCase().includes(query);
+
+    const matchProduct = (look.product_slugs || []).some(slug => {
+      const prod = allCatalog[slug];
+      return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
+    });
+
+    return matchTitle || matchId || matchCol || matchProduct;
+  });
+
+  if (matchedLooks.length === 0) {
+    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Tidak ada Look yang cocok dengan "${query}".</div>`;
+    triggerGridAnimation(container);
+    return;
+  }
+
+  container.innerHTML = matchedLooks.map(look => renderLookCardHTML(look)).join('');
+  triggerGridAnimation(container);
 }
 
 // Render Grid / Slider Curated Looks
@@ -329,9 +365,13 @@ function renderCatalogGrid(query = '') {
 }
 
 // C. Pencarian Global
+// C. Pencarian Global
 function renderGlobalSearchResults(query) {
   const container = document.getElementById('grid-container');
   if (!container) return;
+
+  // FIX 1: PAKSA CONTAINER PAKAI GRID LAYOUT (Mencegah Gambar Raksasa)
+  container.className = 'lookbook-grid';
 
   const matchedLooks = Object.values(allLooks).filter(look => {
     const matchTitle = (look.title || '').toLowerCase().includes(query);
@@ -350,16 +390,19 @@ function renderGlobalSearchResults(query) {
     const matchTitle = (item.title || '').toLowerCase().includes(query);
     const matchSubCat = (item.category || '').toLowerCase().includes(query);
     const matchSlug = slug.toLowerCase().includes(query);
-    return matchTitle || matchSubCat || matchSlug;
+    const matchId = (item.id || '').toLowerCase().includes(query);
+    return matchTitle || matchSubCat || matchSlug || matchId;
   });
 
   if (matchedLooks.length === 0 && matchedCatalog.length === 0) {
     container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Tidak ada hasil untuk "${query}".</div>`;
+    triggerGridAnimation(container);
     return;
   }
 
   let html = '';
 
+  // Render Hasil Look
   matchedLooks.forEach(look => {
     const itemCount = (look.product_slugs || []).length;
     const lookCode = formatCode(look.id || '');
@@ -383,6 +426,7 @@ function renderGlobalSearchResults(query) {
     `;
   });
 
+  // Render Hasil Individual Catalog Item
   matchedCatalog.forEach(([slug, item]) => {
     const itemCode = formatCode(item.id || slug);
     const itemTitle = cleanTitle(item.title, itemCode);
@@ -406,6 +450,9 @@ function renderGlobalSearchResults(query) {
   });
 
   container.innerHTML = html;
+
+  // FIX 2: TRIGGER ANIMASI SOFT FADE-IN
+  triggerGridAnimation(container);
 }
 
 // 5. MODAL DETAIL LOOK
