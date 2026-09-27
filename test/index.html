@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Isolation</title>
+  <link rel="stylesheet" href="/test/style.css">
+</head>
+<body>
+  <h1>Halaman Tes Isolasi</h1>
+  <p>Jika CSS masuk, teks di atas berwarna hijau dan tombol di bawah berwarna biru.</p>
+  
+  <button onclick="toggleModal()">Buka / Tutup Modal</button>
+
+  <div id="test-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <span class="close-btn" onclick="toggleModal()">&times;</span>
+      <h2>Ini Isian Modal Uji Coba</h2>
+      <p>Jika CSS bekerja, box ini melayang dengan background gelap transparan di belakangnya.</p>
+    </div>
+  </div>
+
+  <script src="/test/script.js"></script>
+</body>
+</html>
