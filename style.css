@@ -471,13 +471,34 @@ main {
   50% { transform: translate(-50%, -6px); }
 }
 
+/* Mengunci total scroll pada body saat modal terbuka */
 body.no-scroll {
   overflow: hidden !important;
-  touch-action: none;
+  height: 100vh !important;
+  touch-action: none; /* Mencegah gestur scroll di layar mobile */
 }
 
-.modal-body-scrollable {
-  overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 40px !important;
+/* Pastikan backdrop modal menangkap event touch & scroll sendiri */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Agar area di dalam modal bisa di-scroll dengan mulus di mobile */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; 
+}
+
+/* Kontainer modal di dalamnya */
+.modal-container {
+  touch-action: auto; /* Izinkan scroll HANYA di dalam kotak modal */
+  max-height: 90vh;
+  overflow-y: auto;
 }

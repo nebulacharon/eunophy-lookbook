@@ -1,6 +1,6 @@
 export async function onRequestGet(context) {
     const { params, env, request } = context;
-    const lookId = params.id;
+    const lookId = params.id ? params.id.toLowerCase() : '';
   
     try {
       // 1. Ambil data dari Cloudflare KV
@@ -19,7 +19,7 @@ export async function onRequestGet(context) {
       const lookImage = look.hero_image || "";
       const siteUrl = new URL(request.url).origin;
   
-      // 2. Render Full SPA HTML yang Sinkron dengan index.html
+      // 2. Render Full SPA HTML + Auto Open Modal Script
       const html = `<!DOCTYPE html>
   <html lang="id">
   <head>
@@ -39,6 +39,7 @@ export async function onRequestGet(context) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
+    <!-- Gunakan Absolute Path '/' agar CSS tidak Not Found -->
     <link rel="stylesheet" href="/style.css">
   </head>
   <body>
@@ -91,7 +92,23 @@ export async function onRequestGet(context) {
       </div>
     </div>
   
+    <!-- Absolute Path untuk App JS -->
     <script src="/app.js"></script>
+  
+    <!-- SCRIPT TAMBAHAN: Auto Open Modal saat data selesai dimuat dari JS -->
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        // Tunggu hingga data dari app.js selesai diambil, lalu buka modal
+        const checkDataAndOpen = setInterval(() => {
+          if (typeof allLooks !== 'undefined' && Object.keys(allLooks).length > 0) {
+            clearInterval(checkDataAndOpen);
+            if (typeof openLookDetailModal === 'function') {
+              openLookDetailModal('${lookId}');
+            }
+          }
+        }, 100);
+      });
+    </script>
   </body>
   </html>`;
   

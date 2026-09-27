@@ -439,7 +439,7 @@ function closeDetailModal() {
   if (modal) modal.classList.remove('active');
   document.body.classList.remove('no-scroll');
 
-  if (window.location.pathname.startsWith('/look/')) {
+  if (window.location.pathname !== '/') {
     window.history.pushState({}, '', '/');
   }
 }
