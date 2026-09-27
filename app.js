@@ -48,19 +48,17 @@ function switchViewMode(mode) {
 
   const btnLooks = document.getElementById('btn-view-looks');
   const btnCatalog = document.getElementById('btn-view-catalog');
-  const catNav = document.getElementById('category-nav');
   const colBar = document.getElementById('collections-bar');
 
   if (btnLooks) btnLooks.classList.toggle('active', mode === 'looks');
   if (btnCatalog) btnCatalog.classList.toggle('active', mode === 'catalog');
 
-  if (catNav) {
-    catNav.style.display = (mode === 'catalog') ? 'flex' : 'none';
-  }
-
+  // Bar koleksi hanya tampil di mode 'looks'
   if (colBar) {
     colBar.style.display = (mode === 'looks') ? 'flex' : 'none';
   }
+
+  // Catatan: Kategori Nav (Tops, Bottoms, dll) TETAP DITAMPILKAN secara konsisten.
 
   applyFilterAndRender();
 }
@@ -133,12 +131,12 @@ function renderLooksGrid() {
             <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:8px;">
           <div style="display:flex; flex-direction:column; gap:2px;">
-            <strong style="font-size:12px; color:#0f172a; letter-spacing:0.5px;">${lookCode}</strong>
-            <span style="font-size:13px; color:#334155;">${lookTitle}</span>
+            <strong style="font-size:11px; color:#64748b; letter-spacing:0.5px; text-transform:uppercase;">${lookCode}</strong>
+            <span style="font-family:'Cormorant Garamond', serif; font-size:16px; font-weight:600; color:#0f172a; line-height:1.2;">${lookTitle}</span>
           </div>
-          <span class="category-tag" style="white-space:nowrap; margin-top:2px;">${itemCount} Items</span>
+          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8; margin-top:2px;">${itemCount} Items</span>
         </div>
       </div>
     `;
@@ -173,7 +171,7 @@ function renderCatalogGrid() {
     const itemTitle = cleanTitle(item.title, itemCode);
 
     return `
-      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer">
+      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
         <div class="img-container">
           <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
           <div class="overlay-info">
@@ -181,12 +179,12 @@ function renderCatalogGrid() {
             <span class="overlay-action">Klik untuk beli di Shopee ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:8px;">
           <div style="display:flex; flex-direction:column; gap:2px;">
-            <strong style="font-size:12px; color:#0f172a; letter-spacing:0.5px;">${itemCode}</strong>
-            <span style="font-size:13px; color:#334155;">${itemTitle}</span>
+            <strong style="font-size:11px; color:#64748b; letter-spacing:0.5px; text-transform:uppercase;">${itemCode}</strong>
+            <span style="font-family:'Cormorant Garamond', serif; font-size:16px; font-weight:600; color:#0f172a; line-height:1.2;">${itemTitle}</span>
           </div>
-          <span class="category-tag" style="white-space:nowrap; margin-top:2px;">${item.category || 'Lookbook'}</span>
+          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8; margin-top:2px; text-transform:capitalize;">${item.category || item.segment || 'Item'}</span>
         </div>
       </a>
     `;
@@ -241,12 +239,12 @@ function renderGlobalSearchResults(query) {
             <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:8px;">
           <div style="display:flex; flex-direction:column; gap:2px;">
-            <strong style="font-size:12px; color:#0f172a; letter-spacing:0.5px;">${lookCode}</strong>
-            <span style="font-size:13px; color:#334155;">${lookTitle}</span>
+            <strong style="font-size:11px; color:#64748b; letter-spacing:0.5px; text-transform:uppercase;">${lookCode}</strong>
+            <span style="font-family:'Cormorant Garamond', serif; font-size:16px; font-weight:600; color:#0f172a; line-height:1.2;">${lookTitle}</span>
           </div>
-          <span class="category-tag" style="white-space:nowrap; margin-top:2px;">${itemCount} Items</span>
+          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8; margin-top:2px;">${itemCount} Items</span>
         </div>
       </div>
     `;
@@ -258,7 +256,7 @@ function renderGlobalSearchResults(query) {
     const itemTitle = cleanTitle(item.title, itemCode);
 
     html += `
-      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer">
+      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
         <div class="img-container" style="position:relative;">
           <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
           <span style="position:absolute; top:8px; right:8px; background:#e2e8f0; color:#1e293b; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">SINGLE ITEM</span>
@@ -267,12 +265,12 @@ function renderGlobalSearchResults(query) {
             <span class="overlay-action">Klik untuk beli di Shopee ↗</span>
           </div>
         </div>
-        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="card-bottom" style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:8px;">
           <div style="display:flex; flex-direction:column; gap:2px;">
-            <strong style="font-size:12px; color:#0f172a; letter-spacing:0.5px;">${itemCode}</strong>
-            <span style="font-size:13px; color:#334155;">${itemTitle}</span>
+            <strong style="font-size:11px; color:#64748b; letter-spacing:0.5px; text-transform:uppercase;">${itemCode}</strong>
+            <span style="font-family:'Cormorant Garamond', serif; font-size:16px; font-weight:600; color:#0f172a; line-height:1.2;">${itemTitle}</span>
           </div>
-          <span class="category-tag" style="white-space:nowrap; margin-top:2px;">${item.category || 'Lookbook'}</span>
+          <span class="category-tag" style="white-space:nowrap; font-size:11px; color:#94a3b8; margin-top:2px; text-transform:capitalize;">${item.category || item.segment || 'Item'}</span>
         </div>
       </a>
     `;
@@ -281,7 +279,7 @@ function renderGlobalSearchResults(query) {
   container.innerHTML = html;
 }
 
-// --- 5. MODAL POPUP DETAIL LOOK (Lengkap dengan Scroll Lock & Single Close Button) ---
+// --- 5. MODAL POPUP DETAIL LOOK ---
 function openLookDetailModal(lookId) {
   const look = allLooks[lookId];
   if (!look) return;
@@ -290,7 +288,7 @@ function openLookDetailModal(lookId) {
   const body = document.getElementById('modal-content-body');
   if (!modal || !body) return;
 
-  // 🔒 1. Kunci Scroll Body Utama saat modal terbuka
+  // 🔒 Kunci Scroll Body Utama saat modal terbuka
   document.body.classList.add('no-scroll');
 
   const attachedProducts = (look.product_slugs || [])
@@ -301,7 +299,7 @@ function openLookDetailModal(lookId) {
   const lookTitle = cleanTitle(look.title, lookCode);
 
   body.innerHTML = `
-    <!-- Header Modal (Menggunakan Tombol Close Bawaan HTML) -->
+    <!-- Header Modal -->
     <div style="position: relative; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
       <h2 style="font-family:'Cormorant Garamond', serif; font-size: 24px; margin: 0 40px 6px 0; color:#0f172a; line-height: 1.2;">${lookTitle}</h2>
       
@@ -315,8 +313,8 @@ function openLookDetailModal(lookId) {
       </div>
     </div>
 
-    <!-- Body Modal Grid -->
-    <div class="modal-body-scrollable" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-height: 75vh; overflow-y: auto;">
+    <!-- Body Modal Grid dengan Tambahan Bottom Padding untuk Scroll HP -->
+    <div class="modal-body-scrollable" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-height: 75vh; overflow-y: auto; padding-bottom: 40px;">
       <!-- Hero Image Wrapper -->
       <div style="position: relative;">
         <img src="${look.hero_image}" alt="${lookTitle}" style="width:100%; border-radius:8px; object-fit:cover; display:block;">
@@ -356,7 +354,7 @@ function openLookDetailModal(lookId) {
 
   modal.classList.add('active');
 
-  // 2. Mengubah URL browser menjadi /look/lk-0001
+  // Mengubah URL browser menjadi /look/lk-0001
   window.history.pushState({}, '', `/look/${look.id}`);
 
   // Event Scroll Listener untuk menyembunyikan hint mobile
@@ -386,7 +384,7 @@ function closeDetailModal() {
   }
 }
 
-// Fitur Share Native dengan URL Rapi (/look/lk-0001)
+// Fitur Share Native
 async function shareLookLink(lookId, lookTitle) {
   const shareUrl = `${window.location.origin}/look/${lookId}`;
   

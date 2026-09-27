@@ -490,8 +490,10 @@ body.no-scroll {
   touch-action: none; /* Mengunci gesture sentuhan background di HP */
 }
 
-/* Memastikan area scroll di dalam modal TIDAK bocor ke background */
+/* Perbaikan agar item terakhir tidak tertutup/terpotong di mobile */
 .modal-body-scrollable {
   overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch; /* Scroll mulus untuk iOS/Safari */
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 40px !important; /* Memberi ruang napas ekstra di paling bawah */
 }
+
