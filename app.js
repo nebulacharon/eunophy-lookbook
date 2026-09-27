@@ -231,6 +231,29 @@ function scrollSlider(collectionId, distance) {
   }
 }
 
+// Helper Template Kartu Look (Agar re-usable)
+function renderLookCardHTML(look) {
+  const itemCount = (look.product_slugs || []).length;
+  const lookCode = formatCode(look.id || '');
+  const lookTitle = cleanTitle(look.title, lookCode);
+
+  return `
+    <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
+      <div class="img-container">
+        <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
+        <div class="overlay-info">
+          <span class="overlay-code">${lookCode}</span>
+          <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <span class="product-title">${lookTitle}</span>
+        <span class="category-tag">${itemCount} Items</span>
+      </div>
+    </div>
+  `;
+}
+
 // B. Render Grid Catalog Items
 function renderCatalogGrid(query = '') {
   const container = document.getElementById('grid-container');
