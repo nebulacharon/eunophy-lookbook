@@ -131,56 +131,97 @@ function applyFilterAndRender() {
 }
 
 // A. Render Grid Curated Looks
+// A. Render Grid / Slider Curated Looks
 function renderLooksGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
   let looksList = Object.values(allLooks);
 
+  // Jika user memilih spesifik 1 koleksi dari chip (bukan "all")
   if (currentCollection !== 'all') {
     looksList = looksList.filter(look => look.collection_id === currentCollection);
-  }
 
-  if (query.length > 0) {
-    looksList = looksList.filter(look => {
-      const matchTitle = (look.title || '').toLowerCase().includes(query);
-      const matchId = (look.id || '').toLowerCase().includes(query);
-      const matchCol = (look.collection_id || '').toLowerCase().includes(query);
-      const matchProduct = (look.product_slugs || []).some(slug => {
-        const prod = allCatalog[slug];
-        return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
-      });
-      return matchTitle || matchId || matchCol || matchProduct;
-    });
-  }
+    if (looksList.length === 0) {
+      container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Belum ada Curated Look di koleksi ini.</div>`;
+      return;
+    }
 
-  if (looksList.length === 0) {
-    const msg = query ? `Tidak ada Look yang cocok dengan "${query}"` : 'Belum ada Curated Look yang sesuai.';
-    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">${msg}</div>`;
+    // Tampilkan grid biasa jika hanya memilih 1 koleksi spesifik
+    container.className = 'lookbook-grid';
+    container.innerHTML = looksList.map(look => renderLookCardHTML(look)).join('');
     return;
   }
 
-  container.innerHTML = looksList.map(look => {
-    const itemCount = (look.product_slugs || []).length;
-    const lookCode = formatCode(look.id || '');
-    const lookTitle = cleanTitle(look.title, lookCode);
+  // JIKA MODE "ALL COLLECTIONS": Grouping per Collection (Horizontal Slider)
+  container.className = 'collections-section-list';
+  const collectionsList = Object.values(allCollections);
 
-    return `
-      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
-        <div class="img-container">
-          <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <div class="overlay-info">
-            <span class="overlay-code">${lookCode}</span>
-            <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
+  if (collectionsList.length === 0 && looksList.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:40px; color:#888;">Belum ada Curated Look yang sesuai.</div>`;
+    return;
+  }
+
+  let html = '';
+
+  collectionsList.forEach(col => {
+    // Filter look yang milik koleksi ini
+    const colLooks = looksList.filter(look => look.collection_id === col.id);
+
+    if (colLooks.length > 0) {
+      html += `
+        <div class="collection-row">
+          <div class="collection-row-header">
+            <h3 class="collection-row-title">${col.title}</h3>
+            <button class="btn-see-all" onclick="selectCollection('${col.id}')">Lihat Semua ↗</button>
+          </div>
+          <div class="horizontal-slider">
+            ${colLooks.map(look => renderLookCardHTML(look)).join('')}
           </div>
         </div>
-        <div class="card-bottom">
-          <span class="product-title">${lookTitle}</span>
-          <span class="category-tag">${itemCount} Items</span>
+      `;
+    }
+  });
+
+  // Untuk Look yang tidak masuk koleksi manapun (uncategorized)
+  const orphanLooks = looksList.filter(look => !look.collection_id);
+  if (orphanLooks.length > 0) {
+    html += `
+      <div class="collection-row">
+        <div class="collection-row-header">
+          <h3 class="collection-row-title">Other Looks</h3>
+        </div>
+        <div class="horizontal-slider">
+          ${orphanLooks.map(look => renderLookCardHTML(look)).join('')}
         </div>
       </div>
     `;
-  }).join('');
+  }
+
+  container.innerHTML = html;
+}
+
+// Helper Template Kartu Look (Agar re-usable)
+function renderLookCardHTML(look) {
+  const itemCount = (look.product_slugs || []).length;
+  const lookCode = formatCode(look.id || '');
+  const lookTitle = cleanTitle(look.title, lookCode);
+
+  return `
+    <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
+      <div class="img-container">
+        <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
+        <div class="overlay-info">
+          <span class="overlay-code">${lookCode}</span>
+          <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
+        </div>
+      </div>
+      <div class="card-bottom">
+        <span class="product-title">${lookTitle}</span>
+        <span class="category-tag">${itemCount} Items</span>
+      </div>
+    </div>
+  `;
 }
 
 // B. Render Grid Catalog Items
