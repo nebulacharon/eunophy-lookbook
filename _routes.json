@@ -1,7 +1,10 @@
 {
     "version": 1,
     "include": [
-      "/functions/*"
+      "/look/*",
+      "/item/*",
+      "/p/*",
+      "/api/*"
     ],
     "exclude": [
       "/style.css",
