@@ -10,7 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css">
+  <!-- GUNAKAN ABSOLUTE PATH /style.css -->
+  <link rel="stylesheet" href="/style.css">
   <style>
     /* Styling Tambahan Khusus Elemen Sistem Baru */
     .view-mode-tabs {
@@ -63,8 +64,8 @@
       border-color: #0f172a;
     }
 
-    /* Modal Styling */
-    .modal-overlay {
+    /* Modal Styling diselaraskan dengan app.js & Cloudflare Function */
+    .modal-overlay, .modal-backdrop {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.6);
@@ -75,8 +76,8 @@
       padding: 16px;
       backdrop-filter: blur(4px);
     }
-    .modal-overlay.active { display: flex; }
-    .modal-card {
+    .modal-overlay.active, .modal-backdrop.active { display: flex; }
+    .modal-card, .modal-container {
       background: #ffffff;
       width: 100%;
       max-width: 720px;
@@ -86,7 +87,7 @@
       padding: 24px;
       position: relative;
     }
-    .modal-close-btn {
+    .modal-close-btn, .modal-close {
       position: absolute;
       top: 16px;
       right: 16px;
@@ -95,6 +96,7 @@
       font-size: 24px;
       cursor: pointer;
       color: #64748b;
+      z-index: 10;
     }
   </style>
 </head>
@@ -103,7 +105,7 @@
   <!-- HEADER STICKY -->
   <header>
     <div class="header-container">
-      <div class="brand-title">EUNOPHY</div>
+      <a href="/" class="brand-title" style="text-decoration:none; color:inherit;">EUNOPHY</a>
       <div class="search-box">
         <span class="search-icon">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -135,8 +137,8 @@
         <h1 class="hero-title">Wear what makes you<br>feel like yourself</h1>
       </div>
 
-      <!-- Floating Character Art -->
-      <img src="assets/images/hero-floating.png" class="hero-floating-art" alt="Eunophy editorial illustration" loading="eager">
+      <!-- Floating Character Art (GUNAKAN ABSOLUTE PATH /assets/...) -->
+      <img src="/assets/images/hero-floating.png" class="hero-floating-art" alt="Eunophy editorial illustration" loading="eager" onerror="this.style.display='none'">
 
       <!-- Layer Depan -->
       <div class="petals-container layer-front" aria-hidden="true">
@@ -164,7 +166,7 @@
       <!-- Diisi dinamis oleh app.js -->
     </div>
 
-    <!-- Editorial Category Segments Bar (Aktif pada mode Catalog / Filter Segmen) -->
+    <!-- Editorial Category Segments Bar -->
     <nav class="category-nav" id="category-nav" aria-label="Main Categories">
       <button type="button" class="cat-pill active" data-segment="all">All</button>
       <button type="button" class="cat-pill" data-segment="tops">Tops</button>
@@ -184,16 +186,17 @@
     </div>
   </main>
 
-  <!-- MODAL DETAIL LOOKBOOK (POPUP UNTUK DETAIL FULL OUTFIT) -->
-  <div id="detail-modal" class="modal-overlay">
-    <div class="modal-card">
-      <button class="modal-close-btn" onclick="closeDetailModal()">&times;</button>
+  <!-- MODAL DETAIL LOOKBOOK -->
+  <div id="detail-modal" class="modal-overlay modal-backdrop">
+    <div class="modal-card modal-container">
+      <button class="modal-close-btn modal-close" onclick="closeDetailModal()">&times;</button>
       <div id="modal-content-body">
         <!-- Diisi dinamis oleh app.js ketika kartu Look diklik -->
       </div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <!-- GUNAKAN ABSOLUTE PATH /app.js -->
+  <script src="/app.js"></script>
 </body>
 </html>

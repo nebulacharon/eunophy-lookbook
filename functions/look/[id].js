@@ -6,18 +6,18 @@ export async function onRequestGet(context) {
     try {
       const originUrl = new URL(request.url).origin;
   
-      // 1. Ambil file index.html ASLI dari Cloudflare Static Assets
+      // 1. Memanggil index.html asli dari Static Assets Cloudflare
       const assetResponse = await env.ASSETS.fetch(`${originUrl}/index.html`);
       let html = await assetResponse.text();
   
       // 2. Ambil data looks dari KV Store
       const looksData = await env.EUNOPHY_KV.get("looks", { type: "json" }) || {};
       
-      // Pencarian ID tanpa memedulikan huruf besar/kecil (case-insensitive)
+      // Cari look (case-insensitive)
       const matchedKey = Object.keys(looksData).find(key => key.toLowerCase() === searchId);
       const look = matchedKey ? looksData[matchedKey] : null;
   
-      // 3. Jika look ditemukan, inject Meta Tag OpenGraph ke dalam index.html
+      // 3. Inject Meta Tag OpenGraph dinamis
       if (look) {
         const lookTitle = look.title || "Curated Look";
         const lookImage = look.hero_image || "";
@@ -32,17 +32,15 @@ export async function onRequestGet(context) {
       <meta property="og:type" content="article">
         `;
   
-        // Ganti tag <title> bawaan di index.html dengan Meta Tags dinamis ini
         html = html.replace(/<title>.*?<\/title>/i, metaTags);
       }
   
-      // 4. Kirim HTML yang sudah disempurnakan ke browser
       return new Response(html, {
         headers: { "Content-Type": "text/html; charset=utf-8" }
       });
   
     } catch (err) {
-      return new Response("Terjadi kesalahan server: " + err.message, { 
+      return new Response("Server Error: " + err.message, { 
         status: 500,
         headers: { "Content-Type": "text/plain; charset=utf-8" }
       });
