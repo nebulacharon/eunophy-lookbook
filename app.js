@@ -3,12 +3,13 @@ var allCatalog = typeof allCatalog !== 'undefined' ? allCatalog : {};
 var allLooks = typeof allLooks !== 'undefined' ? allLooks : {};
 var allCollections = typeof allCollections !== 'undefined' ? allCollections : {};
 
-let currentViewMode = 'looks'; // 'looks' atau 'catalog'
-let currentSegment = 'all';
-let currentCollection = 'all';
+var currentViewMode = typeof currentViewMode !== 'undefined' ? currentViewMode : 'looks';
+var currentSegment = typeof currentSegment !== 'undefined' ? currentSegment : 'all';
+var currentCollection = typeof currentCollection !== 'undefined' ? currentCollection : 'all';
 
-const searchInput = document.getElementById('search-input');
-const hero = document.querySelector('.hero-section');
+// Untuk elemen DOM, gunakan 'var' atau 'let' di dalam fungsi / inisialisasi
+var searchInput = document.getElementById('search-input');
+var hero = document.querySelector('.hero-section');
 
 // Helper 1: Membersihkan Judul dari Kode Ganda
 function cleanTitle(title, code) {
