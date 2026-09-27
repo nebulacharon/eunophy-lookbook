@@ -10,12 +10,22 @@ let currentCollection = 'all';
 const searchInput = document.getElementById('search-input');
 const hero = document.querySelector('.hero-section');
 
-// Helper untuk membersihkan Judul dari Kode ganda
+// Helper 1: Membersihkan Judul dari Kode Ganda
 function cleanTitle(title, code) {
   if (!title) return '';
   if (!code) return title;
-  const reg = new RegExp(`^${code}\\s*`, 'i');
+  const reg = new RegExp(`^${code.replace('-', '\\-?')}\\s*`, 'i');
   return title.replace(reg, '').trim();
+}
+
+// Helper 2: Menyisipkan Strip pada Kode Produk (Contoh: EUN0001 -> EUN-0001)
+function formatCode(rawCode) {
+  if (!rawCode) return '';
+  const cleaned = rawCode.toUpperCase().trim();
+  if (cleaned.startsWith('EUN') && !cleaned.startsWith('EUN-')) {
+    return cleaned.replace('EUN', 'EUN-');
+  }
+  return cleaned;
 }
 
 // 1. INISIALISASI & AMBIL DATA
@@ -33,7 +43,7 @@ async function initApp() {
     allCollections = await colRes.json();
 
     renderCollectionsBar();
-    applyFilterAndRender();
+    switchViewMode(currentViewMode);
     checkDirectUrlLook();
   } catch (err) {
     if (container) {
@@ -42,19 +52,24 @@ async function initApp() {
   }
 }
 
-// 2. SWITCH VIEW MODE
+// 2. SWITCH VIEW MODE (Curated Looks VS All Items)
 function switchViewMode(mode) {
   currentViewMode = mode;
 
   const btnLooks = document.getElementById('btn-view-looks');
   const btnCatalog = document.getElementById('btn-view-catalog');
   const colBar = document.getElementById('collections-bar');
+  const catNav = document.querySelector('.category-nav');
 
   if (btnLooks) btnLooks.classList.toggle('active', mode === 'looks');
   if (btnCatalog) btnCatalog.classList.toggle('active', mode === 'catalog');
 
-  if (colBar) {
-    colBar.style.display = (mode === 'looks') ? 'flex' : 'none';
+  if (mode === 'looks') {
+    if (colBar) colBar.style.display = 'flex';
+    if (catNav) catNav.style.display = 'none'; // Sembunyikan kategori item di Curated Looks
+  } else {
+    if (colBar) colBar.style.display = 'none';
+    if (catNav) catNav.style.display = 'flex'; // Tampilkan kategori item di All Items
   }
 
   applyFilterAndRender();
@@ -116,7 +131,7 @@ function renderLooksGrid() {
 
   container.innerHTML = looksList.map(look => {
     const itemCount = (look.product_slugs || []).length;
-    const lookCode = (look.id || '').toUpperCase();
+    const lookCode = formatCode(look.id || '');
     const lookTitle = cleanTitle(look.title, lookCode);
 
     return `
@@ -161,7 +176,7 @@ function renderCatalogGrid() {
   }
 
   container.innerHTML = items.map(([slug, item]) => {
-    const itemCode = (item.id || slug).toUpperCase();
+    const itemCode = formatCode(item.id || slug);
     const itemTitle = cleanTitle(item.title, itemCode);
 
     return `
@@ -216,7 +231,7 @@ function renderGlobalSearchResults(query) {
 
   matchedLooks.forEach(look => {
     const itemCount = (look.product_slugs || []).length;
-    const lookCode = (look.id || '').toUpperCase();
+    const lookCode = formatCode(look.id || '');
     const lookTitle = cleanTitle(look.title, lookCode);
 
     html += `
@@ -238,7 +253,7 @@ function renderGlobalSearchResults(query) {
   });
 
   matchedCatalog.forEach(([slug, item]) => {
-    const itemCode = (item.id || slug).toUpperCase();
+    const itemCode = formatCode(item.id || slug);
     const itemTitle = cleanTitle(item.title, itemCode);
 
     html += `
@@ -277,7 +292,7 @@ function openLookDetailModal(lookId) {
     .map(slug => allCatalog[slug])
     .filter(Boolean);
 
-  const lookCode = (look.id || '').toUpperCase();
+  const lookCode = formatCode(look.id || '');
   const lookTitle = cleanTitle(look.title, lookCode);
 
   body.innerHTML = `
@@ -307,7 +322,7 @@ function openLookDetailModal(lookId) {
         <div style="display: flex; flex-direction: column; gap: 12px;">
           ${attachedProducts.length === 0 ? '<p style="font-size:12px; color:#94a3b8;">Belum ada item terhubung.</p>' : ''}
           ${attachedProducts.map(prod => {
-            const pCode = (prod.id || '').toUpperCase();
+            const pCode = formatCode(prod.id || '');
             const pTitle = cleanTitle(prod.title, pCode);
             return `
               <div style="display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid #f1f5f9; border-radius: 8px; background: #fff;">
