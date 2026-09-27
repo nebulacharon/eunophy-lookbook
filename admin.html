@@ -3,19 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EUNOPHY — Admin Dashboard</title>
+  <title>EUNOPHY — Unified Admin Dashboard</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: #f8fafc; margin: 0; padding: 24px 16px; color: #0f172a; }
     .admin-container { max-width: 960px; margin: 0 auto; }
+    
+    /* Navigation Tabs */
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; overflow-x: auto; }
+    .tab-btn { padding: 10px 18px; border: none; background: none; font-weight: 600; font-size: 13.5px; cursor: pointer; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+    .tab-btn.active { border-color: #0f172a; color: #0f172a; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Cards & Forms UI */
     .card { background: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
     h2 { margin: 0 0 16px 0; font-size: 18px; letter-spacing: 0.5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
     
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #475569; }
-    input[type="text"], input[type="file"] { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13.5px; outline: none; }
+    input[type="text"], input[type="file"], select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13.5px; outline: none; }
     input[type="file"] { padding: 8px; background: #f8fafc; font-size: 12px; }
-    input:focus { border-color: #0f172a; }
+    input:focus, select:focus, textarea:focus { border-color: #0f172a; }
     
     .preview-box { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
     .preview-img { width: 50px; height: 66px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; background: #f1f5f9; display: none; }
@@ -27,6 +36,10 @@
     .btn-edit { background: #e0e7ff; color: #3730a3; padding: 6px 10px; font-size: 11.5px; }
     .btn-danger { background: #fee2e2; color: #991b1b; padding: 6px 10px; font-size: 11.5px; }
     
+    /* Multiselect / Checkbox Items Box */
+    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; background: #f8fafc; }
+    .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+
     /* Search Bar & Stats */
     .table-header-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
     .table-title { font-size: 15px; font-weight: 600; }
@@ -52,77 +65,196 @@
 
   <div class="admin-container">
     
-    <!-- FORM TAMBAH PRODUK -->
-    <div class="card">
-      <h2>EUNOPHY — Tambah Koleksi Baru</h2>
-
-      <div class="form-group">
-        <label>Kode / ID Produk (misal: 6130.b atau Noir Blazer)</label>
-        <input type="text" id="title" placeholder="6130.b">
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px;">Segmen Utama (Main Segment)</label>
-        <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:13px;">
-          <label><input type="radio" name="main_segment" value="tops" checked> Tops</label>
-          <label><input type="radio" name="main_segment" value="bottoms"> Bottoms</label>
-          <label><input type="radio" name="main_segment" value="dresses"> Dresses</label>
-          <label><input type="radio" name="main_segment" value="outerwear"> Outerwear</label>
-          <label><input type="radio" name="main_segment" value="shoes"> Shoes</label>
-          <label><input type="radio" name="main_segment" value="bags"> Bags</label>
-          <label><input type="radio" name="main_segment" value="accessories"> Accessories</label>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Kategori Bebas (misal: Dress & Set, Blazer, Celana, dll)</label>
-        <input type="text" id="category" placeholder="Ketik kategori...">
-      </div>
-
-      <div class="form-group">
-        <label>Upload Foto Produk (Otomatis HD & Kompresi Optimal)</label>
-        <input type="file" id="image_file" accept="image/*">
-        <div class="preview-box">
-          <img id="image_preview" class="preview-img" alt="Preview">
-          <small id="image_status" style="color: #64748b; font-size: 11px;"></small>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Link Shopee Affiliate</label>
-        <input type="text" id="affiliate_url" placeholder="https://s.shopee.co.id/...">
-      </div>
-
-      <button class="btn btn-dark" id="btn-save" onclick="saveNewProduct()">Simpan Koleksi</button>
+    <!-- SYSTEM NAVIGATION TABS -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchAdminTab('tab-products')">1. Produk Items (`EUN`)</button>
+      <button class="tab-btn" onclick="switchAdminTab('tab-looks')">2. Curated Looks (`LK`)</button>
+      <button class="tab-btn" onclick="switchAdminTab('tab-collections')">3. Collections (`CL`)</button>
     </div>
 
-    <!-- TABEL DATA PRODUK & PENCARIAN -->
-    <div class="card">
-      <div class="table-header-bar">
-        <div class="table-title">Daftar Koleksi (<span id="total-count">0</span>)</div>
-        <input type="text" id="search-table" class="search-admin" placeholder="🔍 Cari ID / Kategori...">
+    <!-- TAB 1: PRODUK ITEMS (SISTEM LAMA KAMU DENGAN UI UTUH) -->
+    <div id="tab-products" class="tab-content active">
+      
+      <!-- FORM TAMBAH PRODUK -->
+      <div class="card">
+        <h2>EUNOPHY — Tambah Koleksi Baru</h2>
+
+        <div class="form-group">
+          <label>Kode / ID Produk (misal: 6130.b atau Noir Blazer)</label>
+          <input type="text" id="title" placeholder="6130.b">
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display:block; font-size:13px; font-weight:600; margin-bottom:8px;">Segmen Utama (Main Segment)</label>
+          <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:13px;">
+            <label><input type="radio" name="main_segment" value="tops" checked> Tops</label>
+            <label><input type="radio" name="main_segment" value="bottoms"> Bottoms</label>
+            <label><input type="radio" name="main_segment" value="dresses"> Dresses</label>
+            <label><input type="radio" name="main_segment" value="outerwear"> Outerwear</label>
+            <label><input type="radio" name="main_segment" value="shoes"> Shoes</label>
+            <label><input type="radio" name="main_segment" value="bags"> Bags</label>
+            <label><input type="radio" name="main_segment" value="accessories"> Accessories</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Kategori Bebas (misal: Dress & Set, Blazer, Celana, dll)</label>
+          <input type="text" id="category" placeholder="Ketik kategori...">
+        </div>
+
+        <div class="form-group">
+          <label>Upload Foto Produk (Otomatis HD & Kompresi Optimal)</label>
+          <input type="file" id="image_file" accept="image/*">
+          <div class="preview-box">
+            <img id="image_preview" class="preview-img" alt="Preview">
+            <small id="image_status" style="color: #64748b; font-size: 11px;"></small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Link Shopee Affiliate</label>
+          <input type="text" id="affiliate_url" placeholder="https://s.shopee.co.id/...">
+        </div>
+
+        <button class="btn btn-dark" id="btn-save" onclick="saveNewProduct()">Simpan Koleksi</button>
       </div>
 
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Foto</th>
-              <th>Kode / ID</th>
-              <th>Kategori</th>
-              <th>Single Page (Landing Iklan)</th>
-              <th>Direct (Pinterest)</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            <tr><td colspan="6" style="text-align: center; padding: 24px; color: #94a3b8;">Memuat data koleksi...</td></tr>
-          </tbody>
-        </table>
+      <!-- TABEL DATA PRODUK & PENCARIAN -->
+      <div class="card">
+        <div class="table-header-bar">
+          <div class="table-title">Daftar Koleksi (<span id="total-count">0</span>)</div>
+          <input type="text" id="search-table" class="search-admin" placeholder="🔍 Cari ID / Kategori...">
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Kode / ID</th>
+                <th>Kategori</th>
+                <th>Single Page (Landing Iklan)</th>
+                <th>Direct (Pinterest)</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr><td colspan="6" style="text-align: center; padding: 24px; color: #94a3b8;">Memuat data koleksi...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: CURATED LOOKS (PINTEREST OUTFIT TARGET) -->
+    <div id="tab-looks" class="tab-content">
+      <div class="card">
+        <h2>EUNOPHY — Buat Curated Look Baru</h2>
+        
+        <div class="form-group">
+          <label>ID Look / Slug (misal: LK-0001 atau soft-winter-01)</label>
+          <input type="text" id="look-id" placeholder="LK-0001">
+        </div>
+
+        <div class="form-group">
+          <label>Judul Look / Outfit</label>
+          <input type="text" id="look-title" placeholder="Soft Feminine Winter Outfit">
+        </div>
+
+        <div class="form-group">
+          <label>Pilih Koleksi Utama (Tema)</label>
+          <select id="look-collection-select">
+            <option value="">-- Pilih Koleksi --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Upload Hero Image Full Outfit</label>
+          <input type="file" id="look-image-file" accept="image/*">
+          <div class="preview-box">
+            <img id="look-image-preview" class="preview-img" alt="Preview">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Pilih Item Produk yang Ada di Look Ini (Centang Multi-Product):</label>
+          <div class="checkbox-grid" id="look-products-selector">
+            <span style="color:#94a3b8; font-size:12px;">Memuat daftar produk...</span>
+          </div>
+        </div>
+
+        <button class="btn btn-dark" onclick="saveNewLook()">Simpan Curated Look</button>
+      </div>
+
+      <!-- TABEL DAFTAR LOOKS -->
+      <div class="card">
+        <div class="table-title" style="margin-bottom:14px;">Daftar Curated Looks</div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Hero Image</th>
+                <th>ID Look</th>
+                <th>Judul Look</th>
+                <th>Koleksi</th>
+                <th>Items Terhubung</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="looks-table-body">
+              <tr><td colspan="6" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Look.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: COLLECTIONS (KLASIFIKASI TEMA UTAMA) -->
+    <div id="tab-collections" class="tab-content">
+      <div class="card">
+        <h2>EUNOPHY — Kelola Koleksi Utama (Tema)</h2>
+
+        <div class="form-group">
+          <label>ID Koleksi (misal: winter, autumn, casual-chic)</label>
+          <input type="text" id="col-id" placeholder="winter">
+        </div>
+
+        <div class="form-group">
+          <label>Nama Koleksi</label>
+          <input type="text" id="col-title" placeholder="WINTER COLLECTION 2026">
+        </div>
+
+        <div class="form-group">
+          <label>Deskripsi Singkat Koleksi</label>
+          <textarea id="col-desc" rows="3" placeholder="Warm & cozy layers for cold days..."></textarea>
+        </div>
+
+        <button class="btn btn-dark" onclick="saveNewCollection()">Simpan Koleksi Utama</button>
+      </div>
+
+      <!-- TABEL DAFTAR COLLECTIONS -->
+      <div class="card">
+        <div class="table-title" style="margin-bottom:14px;">Daftar Koleksi Utama</div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID Koleksi</th>
+                <th>Nama Koleksi</th>
+                <th>Deskripsi</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="collections-table-body">
+              <tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Koleksi Utama.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- MODAL EDIT POPUP -->
+  <!-- MODAL EDIT POPUP PRODUK (ASLI MILIKMU) -->
   <div id="edit-modal" class="modal-overlay">
     <div class="modal-box">
       <div class="modal-header">

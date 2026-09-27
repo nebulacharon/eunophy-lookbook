@@ -5,75 +5,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eunophy — Lookbook & Curations</title>
   
-  <!-- Font Serif Editorial (Playfair Display / Cormorant Garamond) -->
+  <!-- Font Serif Editorial -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Styling Tambahan Khusus Elemen Sistem Baru */
+    .view-mode-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 20px 0 10px;
+    }
+    .view-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      padding: 6px 12px;
+      cursor: pointer;
+      color: #737373;
+      transition: all 0.3s ease;
+    }
+    .view-btn.active {
+      color: #0f172a;
+      border-color: #0f172a;
+      font-weight: 600;
+    }
+
+    /* Collections Chip Bar Horizontal Scroll */
+    .collections-chip-bar {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 16px;
+      margin-bottom: 15px;
+      scrollbar-width: none;
+    }
+    .collections-chip-bar::-webkit-scrollbar { display: none; }
+    .col-chip {
+      white-space: nowrap;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .col-chip.active {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 720px;
+      max-height: 85vh;
+      border-radius: 12px;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+    }
+  </style>
 </head>
 <body>
 
-
-<!-- HEADER STICKY -->
-<header>
-  <div class="header-container">
-    <div class="brand-title">EUNOPHY</div>
-    <div class="search-box">
-      <span class="search-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </span>
-      <input type="text" id="search-input" class="search-input" placeholder="Cari koleksi...">
+  <!-- HEADER STICKY -->
+  <header>
+    <div class="header-container">
+      <div class="brand-title">EUNOPHY</div>
+      <div class="search-box">
+        <span class="search-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input type="text" id="search-input" class="search-input" placeholder="Cari style, baju, atau ID...">
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
   <!-- HERO EDITORIAL SECTION -->
-  <!-- HERO EDITORIAL SECTION -->
-<!-- HERO EDITORIAL SECTION -->
-<section class="hero-section">
-  <div class="hero-wrapper">
-    
-    <!-- Layer Belakang (Di belakang karakter & teks) -->
-    <div class="petals-container layer-back" aria-hidden="true">
-      <span class="petal p-back-1"></span>
-      <span class="petal p-back-2"></span>
-      <span class="petal p-back-3"></span>
-      <span class="petal p-back-4"></span>
-      <span class="petal p-back-5"></span>
-      <span class="petal p-back-6"></span>
+  <section class="hero-section">
+    <div class="hero-wrapper">
+      
+      <!-- Layer Belakang -->
+      <div class="petals-container layer-back" aria-hidden="true">
+        <span class="petal p-back-1"></span>
+        <span class="petal p-back-2"></span>
+        <span class="petal p-back-3"></span>
+        <span class="petal p-back-4"></span>
+        <span class="petal p-back-5"></span>
+        <span class="petal p-back-6"></span>
+      </div>
+
+      <!-- Hero Typography -->
+      <div class="hero-content">
+        <h1 class="hero-title">Wear what makes you<br>feel like yourself</h1>
+      </div>
+
+      <!-- Floating Character Art -->
+      <img src="assets/images/hero-floating.png" class="hero-floating-art" alt="Eunophy editorial illustration" loading="eager">
+
+      <!-- Layer Depan -->
+      <div class="petals-container layer-front" aria-hidden="true">
+        <span class="petal p-front-1"></span>
+        <span class="petal p-front-2"></span>
+        <span class="petal p-front-3"></span>
+        <span class="petal p-front-4"></span>
+        <span class="petal p-front-5"></span>
+        <span class="petal p-front-6"></span>
+      </div>
+
     </div>
+  </section>
 
-    <!-- Hero Typography -->
-    <div class="hero-content">
-      <h1 class="hero-title">Wear what makes you<br>feel like yourself</h1>
-    </div>
-
-    <!-- Floating Character Art -->
-    <img src="assets/images/hero-floating.png" class="hero-floating-art" alt="Eunophy editorial illustration" loading="eager">
-
-    <!-- Layer Depan (Melintas TEPAT di depan tubuh karakter & teks) -->
-    <div class="petals-container layer-front" aria-hidden="true">
-      <span class="petal p-front-1"></span>
-      <span class="petal p-front-2"></span>
-      <span class="petal p-front-3"></span>
-      <span class="petal p-front-4"></span>
-      <span class="petal p-front-5"></span>
-      <span class="petal p-front-6"></span>
-    </div>
-
-  </div>
-</section>
-
-  <!-- PRODUCT GRID TETAP -->
+  <!-- MAIN SECTION -->
   <main>
-    <!-- PRODUCT MAIN AREA -->
-  <main>
-    <!-- Editorial Category Segments Bar -->
-    <nav class="category-nav" aria-label="Main Categories">
+    <!-- MODE DISPLAY SWITCHER -->
+    <div class="view-mode-tabs">
+      <button class="view-btn active" id="btn-view-looks" onclick="switchViewMode('looks')">Curated Looks</button>
+      <button class="view-btn" id="btn-view-catalog" onclick="switchViewMode('catalog')">All Items</button>
+    </div>
+
+    <!-- COLLECTIONS BAR (TEMA / SEASON) -->
+    <div id="collections-bar" class="collections-chip-bar">
+      <!-- Diisi dinamis oleh app.js -->
+    </div>
+
+    <!-- Editorial Category Segments Bar (Aktif pada mode Catalog / Filter Segmen) -->
+    <nav class="category-nav" id="category-nav" aria-label="Main Categories">
       <button type="button" class="cat-pill active" data-segment="all">All</button>
       <button type="button" class="cat-pill" data-segment="tops">Tops</button>
       <button type="button" class="cat-pill" data-segment="bottoms">Bottoms</button>
@@ -83,12 +175,24 @@
       <button type="button" class="cat-pill" data-segment="bags">Bags</button>
       <button type="button" class="cat-pill" data-segment="accessories">Accessories</button>
     </nav>
+
+    <!-- PRODUCT / LOOKS GRID -->
     <div id="grid-container" class="lookbook-grid">
       <div style="grid-column: 1/-1; text-align: center; padding: 50px 0; color: #a3a3a3;">
         Memuat koleksi...
       </div>
     </div>
   </main>
+
+  <!-- MODAL DETAIL LOOKBOOK (POPUP UNTUK DETAIL FULL OUTFIT) -->
+  <div id="detail-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeDetailModal()">&times;</button>
+      <div id="modal-content-body">
+        <!-- Diisi dinamis oleh app.js ketika kartu Look diklik -->
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

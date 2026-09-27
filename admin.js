@@ -1,9 +1,14 @@
 const TOKEN = localStorage.getItem('eunophy_admin_token') || prompt("Masukkan Admin Token:") || "adminKatalog2026!";
 if (TOKEN) localStorage.setItem('eunophy_admin_token', TOKEN);
 
+// Storage Data Lokal
 let catalog = {};
+let looks = {};
+let collections = {};
+
 let currentBase64Image = "";
 let editBase64Image = "";
+let lookBase64Image = "";
 
 // --- FUNGSI KOMPRESI HD CANVAS (WEBP QUALITY 0.90) ---
 function processImageToHDWebP(file, callback) {
@@ -41,7 +46,17 @@ function processImageToHDWebP(file, callback) {
   };
 }
 
-// Listener Upload Form Tambah
+// --- TAB NAVIGATION HANDLER ---
+function switchAdminTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+  event.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+// --- IMAGE UPLOAD LISTENERS ---
+// 1. Upload Form Tambah Produk
 document.getElementById('image_file').addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -58,7 +73,7 @@ document.getElementById('image_file').addEventListener('change', function (e) {
   });
 });
 
-// Listener Upload Form Edit
+// 2. Upload Form Edit Produk
 document.getElementById('edit-image-file').addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -69,17 +84,62 @@ document.getElementById('edit-image-file').addEventListener('change', function (
   });
 });
 
-// --- AMBIL & TAMPILKAN DATA DARI KV ---
+// 3. Upload Form Curated Look Hero Image
+document.getElementById('look-image-file').addEventListener('change', function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  processImageToHDWebP(file, (base64) => {
+    lookBase64Image = base64;
+    const preview = document.getElementById('look-image-preview');
+    preview.src = base64;
+    preview.style.display = 'block';
+  });
+});
+
+// --- AMBIL & TAMPILKAN ALL DATA DARI KV ---
+async function initDashboardData() {
+  await loadProducts();
+  await loadCollections();
+  await loadLooks();
+}
+
+// 1. AMBIL DATA PRODUK
 async function loadProducts() {
   try {
-    const res = await fetch('/api/products');
+    const res = await fetch('/api/products?type=catalog');
     catalog = await res.json();
     renderTable(catalog);
+    renderProductCheckboxesInLookForm();
   } catch (err) {
     document.getElementById('table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:red;">Gagal memuat katalog.</td></tr>`;
   }
 }
 
+// 2. AMBIL DATA COLLECTIONS
+async function loadCollections() {
+  try {
+    const res = await fetch('/api/products?type=collections');
+    collections = await res.json();
+    renderCollectionsTable(collections);
+    renderCollectionsDropdown();
+  } catch (err) {
+    console.warn("Gagal memuat collections");
+  }
+}
+
+// 3. AMBIL DATA LOOKS
+async function loadLooks() {
+  try {
+    const res = await fetch('/api/products?type=looks');
+    looks = await res.json();
+    renderLooksTable(looks);
+  } catch (err) {
+    console.warn("Gagal memuat looks");
+  }
+}
+
+// --- RENDER TABEL PRODUK ITEMS ---
 function renderTable(data) {
   const tbody = document.getElementById('table-body');
   const items = Object.entries(data);
@@ -102,36 +162,24 @@ function renderTable(data) {
       </td>
       <td>
         <button class="btn btn-copy" onclick="copyLinkText('${origin}/item/${slug}', 'Link Landing Iklan (Single Page)')" style="display:inline-flex; align-items:center; gap:5px; background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
           Landing Iklan
         </button>
       </td>
       <td>
         <button class="btn btn-copy" onclick="copyLinkText('${origin}/p/${slug}', 'Direct Link Pinterest')" style="display:inline-flex; align-items:center; gap:5px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-          </svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
           Direct
         </button>
       </td>
       <td>
         <div class="action-group">
           <button class="btn btn-edit" onclick="openEditModal('${slug}')" style="display:inline-flex; align-items:center; gap:4px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9"></path>
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-            </svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
             Edit
           </button>
           <button class="btn btn-danger" onclick="deleteProduct('${slug}')" style="display:inline-flex; align-items:center; gap:4px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             Hapus
           </button>
         </div>
@@ -145,7 +193,7 @@ function copyLinkText(link, typeLabel) {
   alert(`${typeLabel} berhasil disalin:\n` + link);
 }
 
-// --- SEARCH FILTER DI ADMIN PANEL ---
+// --- SEARCH FILTER DI TABEL PRODUK ---
 document.getElementById('search-table').addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase().trim();
   const filtered = {};
@@ -183,6 +231,7 @@ async function saveNewProduct() {
   const slug = title.toLowerCase().replace(/[^a-z0-9]/g, '');
 
   const payload = {
+    target: "catalog",
     slug: slug,
     product: {
       title: title,
@@ -240,7 +289,6 @@ function openEditModal(slug) {
   document.getElementById('edit-preview-img').src = item.image;
   editBase64Image = item.image;
 
-  // Pilih radio button segment yang sesuai
   const segmentToSelect = item.segment || 'tops';
   const radio = document.querySelector(`input[name="edit_main_segment"][value="${segmentToSelect}"]`);
   if (radio) radio.checked = true;
@@ -268,6 +316,7 @@ async function submitProductEdit() {
   const newSlug = newTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
 
   const payload = {
+    target: "catalog",
     slug: newSlug,
     product: {
       title: newTitle,
@@ -321,4 +370,179 @@ async function deleteProduct(slug) {
   if (res.ok) loadProducts();
 }
 
-loadProducts();
+// ==========================================
+// LOGIKA BARU: CURATED LOOKS & COLLECTIONS
+// ==========================================
+
+// Render Checkbox Produk Atomik untuk Form Look
+function renderProductCheckboxesInLookForm() {
+  const container = document.getElementById('look-products-selector');
+  const items = Object.entries(catalog);
+
+  if (items.length === 0) {
+    container.innerHTML = `<span style="color:#94a3b8; font-size:12px;">Belum ada produk di katalog.</span>`;
+    return;
+  }
+
+  container.innerHTML = items.map(([slug, item]) => `
+    <label class="checkbox-item">
+      <input type="checkbox" name="look_product" value="${slug}">
+      <span><strong>${item.title}</strong> (${item.segment || 'item'})</span>
+    </label>
+  `).join('');
+}
+
+// Render Dropdown Collections di Form Look
+function renderCollectionsDropdown() {
+  const select = document.getElementById('look-collection-select');
+  const items = Object.entries(collections);
+
+  select.innerHTML = '<option value="">-- Tanpa Koleksi Utama --</option>' + 
+    items.map(([colId, col]) => `<option value="${colId}">${col.title}</option>`).join('');
+}
+
+// SIMPAN CURATED LOOK BARU
+async function saveNewLook() {
+  const lookId = document.getElementById('look-id').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  const title = document.getElementById('look-title').value.trim();
+  const collectionId = document.getElementById('look-collection-select').value;
+  
+  const selectedCheckboxes = document.querySelectorAll('input[name="look_product"]:checked');
+  const productSlugs = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+  if (!lookId || !title) {
+    alert("ID Look dan Judul Look wajib diisi!");
+    return;
+  }
+
+  if (!lookBase64Image) {
+    alert("Silakan upload foto outfit utama (Hero Image)!");
+    return;
+  }
+
+  const payload = {
+    target: "looks",
+    id: lookId,
+    data: {
+      id: lookId,
+      title: title,
+      collection_id: collectionId || "",
+      hero_image: lookBase64Image,
+      product_slugs: productSlugs
+    }
+  };
+
+  try {
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      alert("Curated Look berhasil disimpan!");
+      document.getElementById('look-id').value = '';
+      document.getElementById('look-title').value = '';
+      document.getElementById('look-image-file').value = '';
+      document.getElementById('look-image-preview').style.display = 'none';
+      lookBase64Image = "";
+      loadLooks();
+    } else {
+      alert("Gagal menyimpan Look.");
+    }
+  } catch (err) {
+    alert("Terjadi kesalahan jaringan.");
+  }
+}
+
+// RENDER TABEL LOOKS
+function renderLooksTable(data) {
+  const tbody = document.getElementById('looks-table-body');
+  const items = Object.entries(data);
+  const origin = window.location.origin;
+
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Look.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(([id, look]) => `
+    <tr>
+      <td><img src="${look.hero_image}" class="thumb" onerror="this.src='https://via.placeholder.com/44x58'"></td>
+      <td><strong>${look.id}</strong></td>
+      <td>${look.title}</td>
+      <td><span style="font-size:11px; padding:2px 6px; background:#e2e8f0; border-radius:4px;">${look.collection_id || '-'}</span></td>
+      <td>${(look.product_slugs || []).length} Item</td>
+      <td>
+        <button class="btn btn-copy" onclick="copyLinkText('${origin}/look/${look.id}', 'Link SSR Pinterest Look')">
+          Copy Link Pinterest
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// SIMPAN COLLECTION UTAMA BARU
+async function saveNewCollection() {
+  const colId = document.getElementById('col-id').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  const title = document.getElementById('col-title').value.trim();
+  const description = document.getElementById('col-desc').value.trim();
+
+  if (!colId || !title) {
+    alert("ID Koleksi dan Nama Koleksi wajib diisi!");
+    return;
+  }
+
+  const payload = {
+    target: "collections",
+    id: colId,
+    data: {
+      id: colId,
+      title: title,
+      description: description
+    }
+  };
+
+  try {
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      alert("Koleksi Utama berhasil disimpan!");
+      document.getElementById('col-id').value = '';
+      document.getElementById('col-title').value = '';
+      document.getElementById('col-desc').value = '';
+      loadCollections();
+    } else {
+      alert("Gagal menyimpan Koleksi.");
+    }
+  } catch (err) {
+    alert("Terjadi kesalahan jaringan.");
+  }
+}
+
+// RENDER TABEL COLLECTIONS
+function renderCollectionsTable(data) {
+  const tbody = document.getElementById('collections-table-body');
+  const items = Object.entries(data);
+
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px; color: #94a3b8;">Belum ada Koleksi Utama.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(([id, col]) => `
+    <tr>
+      <td><strong>${col.id}</strong></td>
+      <td>${col.title}</td>
+      <td><small style="color:#64748b;">${col.description || '-'}</small></td>
+      <td><span style="font-size:12px; color:#10b981;">Aktif</span></td>
+    </tr>
+  `).join('');
+}
+
+// Jalankan Inisialisasi Awal
+initDashboardData();
