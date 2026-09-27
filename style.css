@@ -511,91 +511,92 @@ body.no-scroll {
 
 
 /* ==========================================================================
-   HORIZONTAL SLIDER / STREAMING SITE STYLE FOR COLLECTIONS
+   HORIZONTAL SLIDER & FLOATING ARROWS
    ========================================================================== */
 
-   .collections-section-list {
+   .title-with-hint {
     display: flex;
-    flex-direction: column;
-    gap: 36px;
-    width: 100%;
-  }
-  
-  .collection-row {
-    display: flex;
-    flex-direction: column;
+    align-items: baseline;
     gap: 12px;
+  }
+  
+  .scroll-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    opacity: 0.8;
+  }
+  
+  /* Wrapper Pembungkus Slider & Panah Floating */
+  .slider-wrapper {
+    position: relative;
     width: 100%;
   }
   
-  .collection-row-header {
+  /* Tombol Panah Floating */
+  .slider-arrow {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0 4px;
-  }
-  
-  .collection-row-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 22px;
-    font-weight: 600;
-    color: #0f172a;
-    letter-spacing: -0.2px;
-  }
-  
-  .btn-see-all {
-    background: transparent;
-    border: none;
-    font-size: 12px;
-    font-weight: 600;
-    color: #64748b;
+    justify-content: center;
     cursor: pointer;
-    transition: color 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(4px);
+    transition: all 0.25s ease;
+    opacity: 0; /* Sembunyi default, muncul saat dikunjungi/hover */
+    pointer-events: none;
   }
   
-  .btn-see-all:hover {
+  /* Tampilkan Panah saat area Slider di-hover */
+  .slider-wrapper:hover .slider-arrow {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .slider-arrow:hover {
+    background: #ffffff;
     color: var(--accent);
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
   }
   
-  /* Container Horizontal Scroll */
-  .horizontal-slider {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 12px;
-    -webkit-overflow-scrolling: touch;
-    /* Masking halus di ujung kanan-kiri slider */
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 transparent;
+  .slider-arrow.arrow-left {
+    left: -12px;
   }
   
-  .horizontal-slider::-webkit-scrollbar {
-    height: 6px;
+  .slider-arrow.arrow-right {
+    right: -12px;
   }
   
-  .horizontal-slider::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  /* Penyesuaian Tampilan Mobile */
+  @media (max-width: 768px) {
+    .scroll-hint {
+      display: none; /* Disembunyikan di HP karena space terbatas */
+    }
   
-  .horizontal-slider::-webkit-scrollbar-thumb {
-    background-color: #e2e8f0;
-    border-radius: 10px;
-  }
+    /* Di layar sentuh/HP, panah selalu terlihat sedikit lebih samar */
+    .slider-arrow {
+      opacity: 0.85;
+      pointer-events: auto;
+      width: 32px;
+      height: 32px;
+    }
+    
+    .slider-arrow.arrow-left {
+      left: -4px;
+    }
   
-  .horizontal-slider::-webkit-scrollbar-thumb:hover {
-    background-color: #cbd5e1;
-  }
-  
-  /* Mengunci ukuran kartu di dalam slider horizontal */
-  .horizontal-slider .lookbook-card {
-    flex: 0 0 220px; /* Lebar kartu konsisten saat di-scroll */
-    max-width: 220px;
-  }
-  
-  @media (max-width: 640px) {
-    .horizontal-slider .lookbook-card {
-      flex: 0 0 170px; /* Ukuran lebih ringkas untuk mobile */
-      max-width: 170px;
+    .slider-arrow.arrow-right {
+      right: -4px;
     }
   }
