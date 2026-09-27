@@ -510,7 +510,7 @@ body.no-scroll {
 }
 
 /* ==========================================================================
-   HORIZONTAL SLIDER & STREAMING SITE LAYOUT
+   HORIZONTAL SLIDER & STREAMING SITE LAYOUT (KHUSUS CURATED LOOKS)
    ========================================================================== */
 
 /* Container Utama Kumpulan Koleksi */
@@ -522,7 +522,7 @@ body.no-scroll {
 }
 
 /* Row per 1 Koleksi */
-.collection-row {
+.collections-section-list .collection-row {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -530,20 +530,20 @@ body.no-scroll {
 }
 
 /* Header Judul Koleksi & Tombol Lihat Semua */
-.collection-row-header {
+.collections-section-list .collection-row-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 4px;
 }
 
-.title-with-hint {
+.collections-section-list .title-with-hint {
   display: flex;
   align-items: baseline;
   gap: 12px;
 }
 
-.collection-row-title {
+.collections-section-list .collection-row-title {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 24px;
   font-weight: 600;
@@ -551,7 +551,7 @@ body.no-scroll {
   letter-spacing: -0.2px;
 }
 
-.scroll-hint {
+.collections-section-list .scroll-hint {
   font-size: 11px;
   color: var(--text-muted);
   font-weight: 400;
@@ -559,7 +559,7 @@ body.no-scroll {
   opacity: 0.8;
 }
 
-.btn-see-all {
+.collections-section-list .btn-see-all {
   background: transparent;
   border: none;
   font-size: 12.5px;
@@ -569,19 +569,19 @@ body.no-scroll {
   transition: color 0.2s ease;
 }
 
-.btn-see-all:hover {
+.collections-section-list .btn-see-all:hover {
   color: var(--accent);
 }
 
 /* Wrapper Pembungkus Slider & Floating Arrows */
-.slider-wrapper {
+.collections-section-list .slider-wrapper {
   position: relative;
   width: 100%;
 }
 
-/* CONTINUITY BARIS KARTU (Properti Paling Penting!) */
-.horizontal-slider {
-  display: flex !important;
+/* CONTINUITY BARIS KARTU (Hanya berlaku di Curated Looks / collections-section-list) */
+.collections-section-list .horizontal-slider {
+  display: flex;
   gap: 16px;
   overflow-x: auto;
   scroll-behavior: smooth;
@@ -591,32 +591,32 @@ body.no-scroll {
   scrollbar-color: #cbd5e1 transparent;
 }
 
-.horizontal-slider::-webkit-scrollbar {
+.collections-section-list .horizontal-slider::-webkit-scrollbar {
   height: 6px;
 }
 
-.horizontal-slider::-webkit-scrollbar-track {
+.collections-section-list .horizontal-slider::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.horizontal-slider::-webkit-scrollbar-thumb {
+.collections-section-list .horizontal-slider::-webkit-scrollbar-thumb {
   background-color: #e2e8f0;
   border-radius: 10px;
 }
 
-.horizontal-slider::-webkit-scrollbar-thumb:hover {
+.collections-section-list .horizontal-slider::-webkit-scrollbar-thumb:hover {
   background-color: #cbd5e1;
 }
 
-/* Mencegah gambar menjadi raksasa / Mengunci lebar kartu dalam slider */
-.horizontal-slider .lookbook-card {
-  flex: 0 0 220px !important;
-  width: 220px !important;
-  max-width: 220px !important;
+/* Kunci ukuran kartu HANYA jika berada di dalam horizontal-slider */
+.collections-section-list .horizontal-slider .lookbook-card {
+  flex: 0 0 220px;
+  width: 220px;
+  max-width: 220px;
 }
 
 /* Tombol Panah Floating Navigasi */
-.slider-arrow {
+.collections-section-list .slider-arrow {
   position: absolute;
   top: 45%;
   transform: translateY(-50%);
@@ -634,54 +634,54 @@ body.no-scroll {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(4px);
   transition: all 0.25s ease;
-  opacity: 0; /* Sembunyi secara default, muncul saat kursor mendekat */
+  opacity: 0;
   pointer-events: none;
 }
 
-.slider-wrapper:hover .slider-arrow {
+.collections-section-list .slider-wrapper:hover .slider-arrow {
   opacity: 1;
   pointer-events: auto;
 }
 
-.slider-arrow:hover {
+.collections-section-list .slider-arrow:hover {
   background: #ffffff;
   color: var(--accent);
   transform: translateY(-50%) scale(1.08);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
-.slider-arrow.arrow-left {
+.collections-section-list .slider-arrow.arrow-left {
   left: -12px;
 }
 
-.slider-arrow.arrow-right {
+.collections-section-list .slider-arrow.arrow-right {
   right: -12px;
 }
 
 /* Responsif Mobile */
 @media (max-width: 768px) {
-  .scroll-hint {
+  .collections-section-list .scroll-hint {
     display: none;
   }
 
-  .slider-arrow {
+  .collections-section-list .slider-arrow {
     opacity: 0.85;
     pointer-events: auto;
     width: 32px;
     height: 32px;
   }
   
-  .slider-arrow.arrow-left {
+  .collections-section-list .slider-arrow.arrow-left {
     left: -4px;
   }
 
-  .slider-arrow.arrow-right {
+  .collections-section-list .slider-arrow.arrow-right {
     right: -4px;
   }
 
-  .horizontal-slider .lookbook-card {
-    flex: 0 0 170px !important;
-    width: 170px !important;
-    max-width: 170px !important;
+  .collections-section-list .horizontal-slider .lookbook-card {
+    flex: 0 0 170px;
+    width: 170px;
+    max-width: 170px;
   }
 }
