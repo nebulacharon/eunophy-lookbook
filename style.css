@@ -509,94 +509,179 @@ body.no-scroll {
   position: relative;
 }
 
-
 /* ==========================================================================
-   HORIZONTAL SLIDER & FLOATING ARROWS
+   HORIZONTAL SLIDER & STREAMING SITE LAYOUT
    ========================================================================== */
 
-   .title-with-hint {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-  }
-  
+/* Container Utama Kumpulan Koleksi */
+.collections-section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+}
+
+/* Row per 1 Koleksi */
+.collection-row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+/* Header Judul Koleksi & Tombol Lihat Semua */
+.collection-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.title-with-hint {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.collection-row-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+
+.scroll-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  opacity: 0.8;
+}
+
+.btn-see-all {
+  background: transparent;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-see-all:hover {
+  color: var(--accent);
+}
+
+/* Wrapper Pembungkus Slider & Floating Arrows */
+.slider-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* CONTINUITY BARIS KARTU (Properti Paling Penting!) */
+.horizontal-slider {
+  display: flex !important;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 4px 0 12px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.horizontal-slider::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-slider::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.horizontal-slider::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border-radius: 10px;
+}
+
+.horizontal-slider::-webkit-scrollbar-thumb:hover {
+  background-color: #cbd5e1;
+}
+
+/* Mencegah gambar menjadi raksasa / Mengunci lebar kartu dalam slider */
+.horizontal-slider .lookbook-card {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  max-width: 220px !important;
+}
+
+/* Tombol Panah Floating Navigasi */
+.slider-arrow {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(4px);
+  transition: all 0.25s ease;
+  opacity: 0; /* Sembunyi secara default, muncul saat kursor mendekat */
+  pointer-events: none;
+}
+
+.slider-wrapper:hover .slider-arrow {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.slider-arrow:hover {
+  background: #ffffff;
+  color: var(--accent);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.slider-arrow.arrow-left {
+  left: -12px;
+}
+
+.slider-arrow.arrow-right {
+  right: -12px;
+}
+
+/* Responsif Mobile */
+@media (max-width: 768px) {
   .scroll-hint {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 400;
-    letter-spacing: 0.2px;
-    opacity: 0.8;
+    display: none;
   }
-  
-  /* Wrapper Pembungkus Slider & Panah Floating */
-  .slider-wrapper {
-    position: relative;
-    width: 100%;
-  }
-  
-  /* Tombol Panah Floating */
+
   .slider-arrow {
-    position: absolute;
-    top: 45%;
-    transform: translateY(-50%);
-    z-index: 10;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    backdrop-filter: blur(4px);
-    transition: all 0.25s ease;
-    opacity: 0; /* Sembunyi default, muncul saat dikunjungi/hover */
-    pointer-events: none;
-  }
-  
-  /* Tampilkan Panah saat area Slider di-hover */
-  .slider-wrapper:hover .slider-arrow {
-    opacity: 1;
+    opacity: 0.85;
     pointer-events: auto;
-  }
-  
-  .slider-arrow:hover {
-    background: #ffffff;
-    color: var(--accent);
-    transform: translateY(-50%) scale(1.08);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    width: 32px;
+    height: 32px;
   }
   
   .slider-arrow.arrow-left {
-    left: -12px;
+    left: -4px;
   }
-  
+
   .slider-arrow.arrow-right {
-    right: -12px;
+    right: -4px;
   }
-  
-  /* Penyesuaian Tampilan Mobile */
-  @media (max-width: 768px) {
-    .scroll-hint {
-      display: none; /* Disembunyikan di HP karena space terbatas */
-    }
-  
-    /* Di layar sentuh/HP, panah selalu terlihat sedikit lebih samar */
-    .slider-arrow {
-      opacity: 0.85;
-      pointer-events: auto;
-      width: 32px;
-      height: 32px;
-    }
-    
-    .slider-arrow.arrow-left {
-      left: -4px;
-    }
-  
-    .slider-arrow.arrow-right {
-      right: -4px;
-    }
+
+  .horizontal-slider .lookbook-card {
+    flex: 0 0 170px !important;
+    width: 170px !important;
+    max-width: 170px !important;
   }
+}
