@@ -152,30 +152,107 @@ function renderLooksGrid() {
   }).join('');
 }
 
-// B. Render Grid Catalog Items (Single Product EUN-XXXX)
-function renderCatalogGrid() {
+// LOGIKA FILTER & RENDER GRID DENGAN PENCARIAN TERFILTER (FIXED)
+function applyFilterAndRender() {
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+  if (currentViewMode === 'looks') {
+    renderLooksGrid(query);
+  } else {
+    renderCatalogGrid(query);
+  }
+}
+
+// A. Render Grid Curated Looks (Mengisi Tab Curated Looks)
+function renderLooksGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
-  const filtered = {};
+  let looksList = Object.values(allLooks);
 
-  Object.entries(allCatalog).forEach(([slug, item]) => {
-    const itemSegment = (item.segment || 'tops').toLowerCase();
-    const matchSegment = (currentSegment === 'all') || (itemSegment === currentSegment);
+  // Filter 1: Berdasarkan Koleksi
+  if (currentCollection !== 'all') {
+    looksList = looksList.filter(look => look.collection_id === currentCollection);
+  }
 
-    if (matchSegment) {
-      filtered[slug] = item;
-    }
-  });
+  // Filter 2: Berdasarkan Keyword Pencarian (Jika Ada)
+  if (query.length > 0) {
+    looksList = looksList.filter(look => {
+      const matchTitle = (look.title || '').toLowerCase().includes(query);
+      const matchId = (look.id || '').toLowerCase().includes(query);
+      const matchCol = (look.collection_id || '').toLowerCase().includes(query);
 
-  const items = Object.entries(filtered);
+      const matchProduct = (look.product_slugs || []).some(slug => {
+        const prod = allCatalog[slug];
+        return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
+      });
 
-  if (items.length === 0) {
-    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Belum ada produk yang cocok.</div>`;
+      return matchTitle || matchId || matchCol || matchProduct;
+    });
+  }
+
+  if (looksList.length === 0) {
+    const msg = query ? `Tidak ada Look yang cocok dengan "${query}"` : 'Belum ada Curated Look yang sesuai.';
+    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">${msg}</div>`;
     return;
   }
 
-  container.innerHTML = items.map(([slug, item]) => {
+  container.innerHTML = looksList.map(look => {
+    const itemCount = (look.product_slugs || []).length;
+    const lookCode = formatCode(look.id || '');
+    const lookTitle = cleanTitle(look.title, lookCode);
+
+    return `
+      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
+        <div class="img-container">
+          <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
+          <div class="overlay-info">
+            <span class="overlay-code">${lookCode}</span>
+            <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <span class="product-title">${lookTitle}</span>
+          <span class="category-tag">${itemCount} Items</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// B. Render Grid Catalog Items (Mengisi Tab All Items)
+function renderCatalogGrid(query = '') {
+  const container = document.getElementById('grid-container');
+  if (!container) return;
+
+  let itemsList = Object.entries(allCatalog);
+
+  // Filter 1: Berdasarkan Kategori Segment (Tops, Bottoms, dll.)
+  if (currentSegment !== 'all') {
+    itemsList = itemsList.filter(([slug, item]) => {
+      const itemSegment = (item.segment || 'tops').toLowerCase();
+      return itemSegment === currentSegment;
+    });
+  }
+
+  // Filter 2: Berdasarkan Keyword Pencarian (Jika Ada)
+  if (query.length > 0) {
+    itemsList = itemsList.filter(([slug, item]) => {
+      const matchTitle = (item.title || '').toLowerCase().includes(query);
+      const matchSubCat = (item.category || '').toLowerCase().includes(query);
+      const matchSlug = slug.toLowerCase().includes(query);
+      const matchId = (item.id || '').toLowerCase().includes(query);
+      return matchTitle || matchSubCat || matchSlug || matchId;
+    });
+  }
+
+  if (itemsList.length === 0) {
+    const msg = query ? `Tidak ada item yang cocok dengan "${query}"` : 'Belum ada produk yang cocok.';
+    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">${msg}</div>`;
+    return;
+  }
+
+  container.innerHTML = itemsList.map(([slug, item]) => {
     const itemCode = formatCode(item.id || slug);
     const itemTitle = cleanTitle(item.title, itemCode);
 
