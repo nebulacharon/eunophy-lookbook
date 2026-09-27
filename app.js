@@ -131,32 +131,44 @@ function applyFilterAndRender() {
 }
 
 // Render Grid / Slider Curated Looks
+// Helper untuk memicu ulang animasi CSS
+function triggerGridAnimation(container) {
+  container.classList.remove('fade-in-content');
+  void container.offsetWidth; // Force reflow agar animasi teriset
+  container.classList.add('fade-in-content');
+}
+
+// Render Grid / Slider Curated Looks
 function renderLooksGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
   let looksList = Object.values(allLooks);
 
-  // Jika user memilih spesifik 1 koleksi dari chip (bukan "all")
+  // Jika user memilih spesifik 1 koleksi dari chip (misal: Winter Collection)
   if (currentCollection !== 'all') {
     looksList = looksList.filter(look => look.collection_id === currentCollection);
 
     if (looksList.length === 0) {
+      container.className = 'lookbook-grid';
       container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Belum ada Curated Look di koleksi ini.</div>`;
+      triggerGridAnimation(container);
       return;
     }
 
     container.className = 'lookbook-grid';
     container.innerHTML = looksList.map(look => renderLookCardHTML(look)).join('');
+    triggerGridAnimation(container);
     return;
   }
 
-  // JIKA MODE "ALL COLLECTIONS": Horizontal Slider dengan Floating Arrows
+  // JIKA MODE "ALL COLLECTIONS": Horizontal Slider
   container.className = 'collections-section-list';
   const collectionsList = Object.values(allCollections);
 
   if (collectionsList.length === 0 && looksList.length === 0) {
     container.innerHTML = `<div style="text-align:center; padding:40px; color:#888;">Belum ada Curated Look yang sesuai.</div>`;
+    triggerGridAnimation(container);
     return;
   }
 
@@ -177,7 +189,7 @@ function renderLooksGrid(query = '') {
           </div>
           
           <div class="slider-wrapper">
-            <button class="slider-arrow arrow-left" aria-label="Scroll Left" onclick="scrollSlider('${col.id}', -300)">
+            <button class="slider-arrow arrow-left" aria-label="Scroll Left" onclick="scrollSlider('${col.id}', -320)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
             
@@ -185,7 +197,7 @@ function renderLooksGrid(query = '') {
               ${colLooks.map(look => renderLookCardHTML(look)).join('')}
             </div>
 
-            <button class="slider-arrow arrow-right" aria-label="Scroll Right" onclick="scrollSlider('${col.id}', 300)">
+            <button class="slider-arrow arrow-right" aria-label="Scroll Right" onclick="scrollSlider('${col.id}', 320)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
             </button>
           </div>
@@ -206,13 +218,13 @@ function renderLooksGrid(query = '') {
           </div>
         </div>
         <div class="slider-wrapper">
-          <button class="slider-arrow arrow-left" aria-label="Scroll Left" onclick="scrollSlider('orphan', -300)">
+          <button class="slider-arrow arrow-left" aria-label="Scroll Left" onclick="scrollSlider('orphan', -320)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
           <div class="horizontal-slider" id="slider-orphan">
             ${orphanLooks.map(look => renderLookCardHTML(look)).join('')}
           </div>
-          <button class="slider-arrow arrow-right" aria-label="Scroll Right" onclick="scrollSlider('orphan', 300)">
+          <button class="slider-arrow arrow-right" aria-label="Scroll Right" onclick="scrollSlider('orphan', 320)">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
         </div>
@@ -221,6 +233,7 @@ function renderLooksGrid(query = '') {
   }
 
   container.innerHTML = html;
+  triggerGridAnimation(container);
 }
 
 // Fungsi Helper Scroll Horizontal via Tombol Panah
@@ -259,7 +272,6 @@ function renderCatalogGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
-  // Wajib tambahkan ini untuk mereset layout menjadi grid biasa
   container.className = 'lookbook-grid';
 
   let itemsList = Object.entries(allCatalog);
@@ -284,6 +296,7 @@ function renderCatalogGrid(query = '') {
   if (itemsList.length === 0) {
     const msg = query ? `Tidak ada item yang cocok dengan "${query}"` : 'Belum ada produk yang cocok.';
     container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">${msg}</div>`;
+    triggerGridAnimation(container);
     return;
   }
 
@@ -307,6 +320,8 @@ function renderCatalogGrid(query = '') {
       </a>
     `;
   }).join('');
+
+  triggerGridAnimation(container);
 }
 
 // C. Pencarian Global
