@@ -26,6 +26,7 @@ async function initApp() {
 
     renderCollectionsBar();
     applyFilterAndRender();
+    checkDirectUrlLook();
   } catch (err) {
     if (container) {
       container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#e11d48;">Gagal memuat katalog koleksi.</div>`;
@@ -41,13 +42,19 @@ function switchViewMode(mode) {
   const btnLooks = document.getElementById('btn-view-looks');
   const btnCatalog = document.getElementById('btn-view-catalog');
   const catNav = document.getElementById('category-nav');
+  const colBar = document.getElementById('collections-bar');
 
   if (btnLooks) btnLooks.classList.toggle('active', mode === 'looks');
   if (btnCatalog) btnCatalog.classList.toggle('active', mode === 'catalog');
 
-  // Kategori segmen (Tops, Bottoms, dll.) hanya ditampilkan secara fokus saat mode 'catalog'
+  // Kategori segmen (Tops, Bottoms, dll.) hanya ditampilkan saat mode 'catalog'
   if (catNav) {
     catNav.style.display = (mode === 'catalog') ? 'flex' : 'none';
+  }
+
+  // Chip Koleksi hanya dikhususkan saat mode 'looks'
+  if (colBar) {
+    colBar.style.display = (mode === 'looks') ? 'flex' : 'none';
   }
 
   applyFilterAndRender();
@@ -82,10 +89,13 @@ function selectCollection(colId) {
 function applyFilterAndRender() {
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-  if (currentViewMode === 'looks') {
-    renderLooksGrid(query);
+  // Jika user mengetikkan kata kunci pencarian, gunakan Smart Global Search
+  if (query.length > 0) {
+    renderGlobalSearchResults(query);
+  } else if (currentViewMode === 'looks') {
+    renderLooksGrid('');
   } else {
-    renderCatalogGrid(query);
+    renderCatalogGrid('');
   }
 }
 
@@ -101,22 +111,6 @@ function renderLooksGrid(query) {
     looksList = looksList.filter(look => look.collection_id === currentCollection);
   }
 
-  // Filter berdasarkan Pencarian (Search Input)
-  if (query) {
-    looksList = looksList.filter(look => {
-      const matchTitle = (look.title || '').toLowerCase().includes(query);
-      const matchId = (look.id || '').toLowerCase().includes(query);
-
-      // Cek apakah produk atomik di dalamnya cocok dengan pencarian
-      const matchProduct = (look.product_slugs || []).some(slug => {
-        const prod = allCatalog[slug];
-        return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
-      });
-
-      return matchTitle || matchId || matchProduct;
-    });
-  }
-
   if (looksList.length === 0) {
     container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Belum ada Curated Look yang sesuai.</div>`;
     return;
@@ -124,10 +118,12 @@ function renderLooksGrid(query) {
 
   container.innerHTML = looksList.map(look => {
     const itemCount = (look.product_slugs || []).length;
+    const lookCode = (look.id || '').toUpperCase();
     return `
-      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
-        <div class="img-container">
+      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer; position:relative;">
+        <div class="img-container" style="position:relative;">
           <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
+          <span class="look-code-badge" style="position:absolute; top:8px; left:8px; background:rgba(0,0,0,0.65); color:#fff; font-size:11px; padding:3px 7px; border-radius:4px; font-weight:600;">${lookCode}</span>
           <div class="overlay-info">
             <span class="overlay-code">${look.title}</span>
             <span class="overlay-action">
@@ -155,11 +151,7 @@ function renderCatalogGrid(query) {
     const itemSegment = (item.segment || 'tops').toLowerCase();
     const matchSegment = (currentSegment === 'all') || (itemSegment === currentSegment);
 
-    const matchTitle = (item.title || '').toLowerCase().includes(query);
-    const matchSubCat = (item.category || '').toLowerCase().includes(query);
-    const matchSlug = slug.toLowerCase().includes(query);
-
-    if (matchSegment && (matchTitle || matchSubCat || matchSlug)) {
+    if (matchSegment) {
       filtered[slug] = item;
     }
   });
@@ -195,7 +187,87 @@ function renderCatalogGrid(query) {
   `).join('');
 }
 
-// --- 5. MODAL POPUP DETAIL LOOK ---
+// C. Pencarian Cerdas Global (Gabungan Looks & Single Items)
+function renderGlobalSearchResults(query) {
+  const container = document.getElementById('grid-container');
+  if (!container) return;
+
+  // Search di Curated Looks
+  const matchedLooks = Object.values(allLooks).filter(look => {
+    const matchTitle = (look.title || '').toLowerCase().includes(query);
+    const matchId = (look.id || '').toLowerCase().includes(query);
+    const matchCol = (look.collection_id || '').toLowerCase().includes(query);
+
+    const matchProduct = (look.product_slugs || []).some(slug => {
+      const prod = allCatalog[slug];
+      return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
+    });
+
+    return matchTitle || matchId || matchCol || matchProduct;
+  });
+
+  // Search di Catalog Items
+  const matchedCatalog = Object.entries(allCatalog).filter(([slug, item]) => {
+    const matchTitle = (item.title || '').toLowerCase().includes(query);
+    const matchSubCat = (item.category || '').toLowerCase().includes(query);
+    const matchSlug = slug.toLowerCase().includes(query);
+    return matchTitle || matchSubCat || matchSlug;
+  });
+
+  if (matchedLooks.length === 0 && matchedCatalog.length === 0) {
+    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Tidak ada hasil untuk "${query}".</div>`;
+    return;
+  }
+
+  let html = '';
+
+  // Render Hasil Looks
+  matchedLooks.forEach(look => {
+    const itemCount = (look.product_slugs || []).length;
+    const lookCode = (look.id || '').toUpperCase();
+    html += `
+      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer; position:relative;">
+        <div class="img-container" style="position:relative;">
+          <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
+          <span style="position:absolute; top:8px; right:8px; background:#0f172a; color:#fff; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px;">LOOK / COLLECTION</span>
+          <span class="look-code-badge" style="position:absolute; top:8px; left:8px; background:rgba(0,0,0,0.65); color:#fff; font-size:11px; padding:3px 7px; border-radius:4px; font-weight:600;">${lookCode}</span>
+          <div class="overlay-info">
+            <span class="overlay-code">${look.title}</span>
+            <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <span class="product-code">${look.title}</span>
+          <span class="category-tag">${itemCount} Items Outfit</span>
+        </div>
+      </div>
+    `;
+  });
+
+  // Render Hasil Catalog Items
+  matchedCatalog.forEach(([slug, item]) => {
+    html += `
+      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer" style="position:relative;">
+        <div class="img-container" style="position:relative;">
+          <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
+          <span style="position:absolute; top:8px; right:8px; background:#e2e8f0; color:#1e293b; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px;">SINGLE ITEM</span>
+          <div class="overlay-info">
+            <span class="overlay-code">${item.title}</span>
+            <span class="overlay-action">Klik untuk beli di Shopee ↗</span>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <span class="product-code">${item.title}</span>
+          <span class="category-tag">${item.category || 'Lookbook'}</span>
+        </div>
+      </a>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// --- 5. MODAL POPUP DETAIL LOOK (DESAIN UNIFIED FIX) ---
 function openLookDetailModal(lookId) {
   const look = allLooks[lookId];
   if (!look) return;
@@ -209,26 +281,45 @@ function openLookDetailModal(lookId) {
     .filter(Boolean);
 
   body.innerHTML = `
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+    <!-- Header Modal (Judul, ID, Share, Close) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
       <div>
-        <img src="${look.hero_image}" alt="${look.title}" style="width:100%; border-radius:8px; object-fit:cover;">
+        <h2 style="font-family:'Cormorant Garamond', serif; font-size: 24px; margin: 0; color:#0f172a;">${look.title}</h2>
+        <span style="font-size: 12px; color: #64748b;">ID Style: ${(look.id || '').toUpperCase()}</span>
       </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button onclick="shareLookLink('${look.id}')" style="display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #cbd5e0; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Bagikan
+        </button>
+        <button onclick="closeDetailModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; padding: 0 4px;">×</button>
+      </div>
+    </div>
+
+    <!-- Body Modal Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+      <!-- Hero Image Wrapper -->
+      <div style="position: relative;">
+        <img src="${look.hero_image}" alt="${look.title}" style="width:100%; border-radius:8px; object-fit:cover; display:block;">
+        <div class="mobile-scroll-hint" style="text-align: center; margin-top: 8px; font-size: 11px; color: #64748b;">
+          Scroll ke bawah untuk melihat items ↓
+        </div>
+      </div>
+
+      <!-- Items Section -->
       <div>
-        <h2 style="font-family:'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 8px;">${look.title}</h2>
-        <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">ID Style: ${look.id}</p>
+        <h4 style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 12px;">Items in this look:</h4>
         
-        <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">Items in this look:</h4>
-        
-        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto;">
+        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 360px; overflow-y: auto; padding-right: 4px;">
           ${attachedProducts.length === 0 ? '<p style="font-size:12px; color:#94a3b8;">Belum ada item terhubung.</p>' : ''}
           ${attachedProducts.map(prod => `
-            <div style="display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid #f1f5f9; border-radius: 6px;">
-              <img src="${prod.image}" alt="${prod.title}" style="width: 50px; height: 65px; object-fit: cover; border-radius: 4px;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid #f1f5f9; border-radius: 8px; background: #fff;">
+              <img src="${prod.image}" alt="${prod.title}" style="width: 50px; height: 65px; object-fit: cover; border-radius: 6px;">
               <div style="flex: 1;">
-                <strong style="display: block; font-size: 13px;">${prod.title}</strong>
+                <strong style="display: block; font-size: 13px; color: #0f172a;">${prod.title}</strong>
                 <span style="font-size: 11px; color: #64748b; text-transform: capitalize;">${prod.segment || 'tops'}</span>
               </div>
-              <a href="${prod.affiliate_url}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; padding: 6px 12px; background: #0f172a; color: #fff; text-decoration: none; border-radius: 4px; white-space: nowrap;">
+              <a href="${prod.affiliate_url}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; padding: 7px 14px; background: #0f172a; color: #fff; text-decoration: none; border-radius: 6px; white-space: nowrap; font-weight: 500;">
                 Shopee ↗
               </a>
             </div>
@@ -244,6 +335,33 @@ function openLookDetailModal(lookId) {
 function closeDetailModal() {
   const modal = document.getElementById('detail-modal');
   if (modal) modal.classList.remove('active');
+  
+  if (window.location.pathname.startsWith('/look/')) {
+    window.history.pushState({}, '', '/');
+  }
+}
+
+// Salin Link Look
+function shareLookLink(lookId) {
+  const shareUrl = `${window.location.origin}/look/${lookId}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert("Link look berhasil disalin!");
+    });
+  } else {
+    prompt("Salin link look berikut:", shareUrl);
+  }
+}
+
+// Buka Look otomatis jika URL berbentuk /look/lk-0001
+function checkDirectUrlLook() {
+  const path = window.location.pathname;
+  if (path.startsWith('/look/')) {
+    const lookId = path.split('/look/')[1];
+    if (lookId && allLooks[lookId]) {
+      setTimeout(() => openLookDetailModal(lookId), 200);
+    }
+  }
 }
 
 // Close Modal saat klik di luar modal card
