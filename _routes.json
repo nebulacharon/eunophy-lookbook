@@ -11,11 +11,7 @@
       "/app.js",
       "/admin.js",
       "/admin.html",
-      "/assets/*",
-      "/*.png",
-      "/*.jpg",
-      "/*.jpeg",
-      "/*.svg",
-      "/*.ico"
+      "/favicon.ico",
+      "/assets/*"
     ]
   }

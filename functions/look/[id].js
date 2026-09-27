@@ -35,7 +35,7 @@ export async function onRequestGet(context) {
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
     <!-- Cukup CSS saja di Head -->
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="${siteUrl}/style.css">
   </head>
   <body>
   
