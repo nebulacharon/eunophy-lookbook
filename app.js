@@ -1,7 +1,7 @@
-// State Lokal Aplikasi
-let allCatalog = {};
-let allLooks = {};
-let allCollections = {};
+// State Lokal Aplikasi (Aman dari redeklarasi ganda)
+var allCatalog = typeof allCatalog !== 'undefined' ? allCatalog : {};
+var allLooks = typeof allLooks !== 'undefined' ? allLooks : {};
+var allCollections = typeof allCollections !== 'undefined' ? allCollections : {};
 
 let currentViewMode = 'looks'; // 'looks' atau 'catalog'
 let currentSegment = 'all';
