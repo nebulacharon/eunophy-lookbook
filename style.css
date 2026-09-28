@@ -248,15 +248,14 @@ main {
    PERBAIKAN KONSISTENSI BARIS FILTER (SUB-NAV)
    ========================================================================== */
 
-/* Buat container filter utama selalu seragam posisinya */
 .collections-chip-bar,
 .category-nav {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: 0;
-  margin-bottom: 24px; /* Spasi bawah seragam ke Grid Kartu */
-  padding: 0 0 4px 0;  /* Padding rata dengan tepi grid */
+  margin-bottom: 24px;
+  padding: 0 0 4px 0;
   overflow-x: auto;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
@@ -268,7 +267,6 @@ main {
   display: none;
 }
 
-/* Samakan tampilan tombol Chip / Pill di kedua mode */
 .col-chip,
 .cat-pill {
   background: transparent;
@@ -491,7 +489,6 @@ main {
   width: 100%;
 }
 
-/* KUNCI PERBAIKAN SLIDER HORIZONTAL: Smooth Scroll & Padding */
 .horizontal-slider {
   display: flex;
   gap: 16px;
@@ -499,7 +496,7 @@ main {
   scroll-behavior: smooth !important;
   -webkit-overflow-scrolling: touch;
   padding: 4px 0 12px 0;
-  scrollbar-width: none; /* Sembunyi secara default untuk keseragaman UI */
+  scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
@@ -507,14 +504,12 @@ main {
   display: none;
 }
 
-/* Ukuran Kartu Khusus di Dalam Slider Horizontal */
 .horizontal-slider .lookbook-card {
   flex: 0 0 220px;
   width: 220px;
   max-width: 220px;
 }
 
-/* Tombol Panah Floating Navigasi Slider */
 .slider-arrow {
   position: absolute;
   top: 45%;
@@ -573,25 +568,27 @@ main {
 }
 
 /* ==========================================================================
-   7. ANIMASI TRANSISI HALUS (FADE IN) & MODAL
+   7. ANIMASI TRANSISI HALUS TAB / GRID (SMOOTH, NO FLASH) & MODAL
    ========================================================================== */
 
-@keyframes softFeminineFade {
+#grid-container {
+  will-change: opacity, transform;
+}
+
+.grid-transition-enter,
+.fade-in-content {
+  animation: smoothSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes smoothSlideUp {
   0% {
-    opacity: 0;
-    transform: translateY(6px) scale(0.995);
-    filter: blur(2px);
+    opacity: 0.3;
+    transform: translateY(10px) scale(0.995);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
-    filter: blur(0);
   }
-}
-
-.fade-in-content {
-  animation: softFeminineFade 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  will-change: opacity, transform, filter;
 }
 
 /* Modal UI */

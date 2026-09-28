@@ -136,19 +136,32 @@ function applyFilterAndRender(allowAnimation = true) {
   }
 }
 
-// Helper Khusus Mengatur Transisi Tanpa Flash
+// Helper Khusus Mengatur Transisi Mulus Tanpa Flash
 function updateGridContent(container, newHTML, allowAnimation = true) {
+  // Jika konten tidak berubah, batalkan re-render
   if (container.innerHTML === newHTML) return;
 
-  if (allowAnimation && lastRenderedHTML !== newHTML) {
-    container.classList.remove('fade-in-content');
-    container.innerHTML = newHTML;
-    
-    requestAnimationFrame(() => {
-      container.classList.add('fade-in-content');
-    });
+  if (allowAnimation) {
+    // 1. Meredupkan konten sebentar (0.1 detik) sebelum DOM diganti
+    container.style.opacity = '0.4';
+
+    setTimeout(() => {
+      // 2. Ganti konten DOM saat opacity dalam kondisi redup
+      container.innerHTML = newHTML;
+      
+      // 3. Reset style inline
+      container.style.opacity = '';
+      
+      // 4. Jalankan animasi slide-up yang halus
+      container.classList.remove('grid-transition-enter');
+      
+      // Trik reflow browser agar animasi ter-trigger ulang dengan mulus
+      void container.offsetWidth; 
+      
+      container.classList.add('grid-transition-enter');
+    }, 100); // Delay singkat 100ms untuk menghilangkan efek 'flash'
   } else {
-    container.classList.remove('fade-in-content');
+    container.classList.remove('grid-transition-enter');
     container.innerHTML = newHTML;
   }
 
