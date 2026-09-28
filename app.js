@@ -117,13 +117,11 @@ function selectCollection(colId) {
 }
 
 // 4. LOGIKA FILTER & RENDER GRID
-// 4. LOGIKA FILTER & RENDER GRID
 function applyFilterAndRender() {
   const searchInput = getSearchInput();
   const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
   if (query.length > 0) {
-    // Jalankan pencarian sesuai dengan mode view yang sedang aktif
     if (currentViewMode === 'looks') {
       renderLooksSearch(query);
     } else {
@@ -166,13 +164,9 @@ function renderLooksSearch(query) {
   triggerGridAnimation(container);
 }
 
-// Render Grid / Slider Curated Looks
 // Helper Animasi Mulus & Soft
 function triggerGridAnimation(container) {
-  // Hapus class lama
   container.classList.remove('fade-in-content');
-  
-  // Memicu animasi secara smooth
   requestAnimationFrame(() => {
     container.classList.add('fade-in-content');
   });
@@ -185,7 +179,6 @@ function renderLooksGrid(query = '') {
 
   let looksList = Object.values(allLooks);
 
-  // Jika user memilih spesifik 1 koleksi dari chip (misal: Winter Collection)
   if (currentCollection !== 'all') {
     looksList = looksList.filter(look => look.collection_id === currentCollection);
 
@@ -202,7 +195,7 @@ function renderLooksGrid(query = '') {
     return;
   }
 
-  // JIKA MODE "ALL COLLECTIONS": Horizontal Slider
+  // MODE "ALL COLLECTIONS": Horizontal Slider
   container.className = 'collections-section-list';
   const collectionsList = Object.values(allCollections);
 
@@ -246,7 +239,6 @@ function renderLooksGrid(query = '') {
     }
   });
 
-  // Untuk Look tanpa koleksi
   const orphanLooks = looksList.filter(look => !look.collection_id);
   if (orphanLooks.length > 0) {
     html += `
@@ -276,7 +268,7 @@ function renderLooksGrid(query = '') {
   triggerGridAnimation(container);
 }
 
-// Fungsi Helper Scroll Horizontal via Tombol Panah
+// Fungsi Helper Scroll Horizontal
 function scrollSlider(collectionId, distance) {
   const slider = document.getElementById(`slider-${collectionId}`);
   if (slider) {
@@ -284,7 +276,7 @@ function scrollSlider(collectionId, distance) {
   }
 }
 
-// Helper Template Kartu Look (Agar re-usable)
+// Helper Template Kartu Look
 function renderLookCardHTML(look) {
   const itemCount = (look.product_slugs || []).length;
   const lookCode = formatCode(look.id || '');
@@ -307,7 +299,7 @@ function renderLookCardHTML(look) {
   `;
 }
 
-// B. Render Grid Catalog Items
+// Render Grid Catalog Items
 function renderCatalogGrid(query = '') {
   const container = document.getElementById('grid-container');
   if (!container) return;
@@ -364,98 +356,7 @@ function renderCatalogGrid(query = '') {
   triggerGridAnimation(container);
 }
 
-// C. Pencarian Global
-// C. Pencarian Global
-function renderGlobalSearchResults(query) {
-  const container = document.getElementById('grid-container');
-  if (!container) return;
-
-  // FIX 1: PAKSA CONTAINER PAKAI GRID LAYOUT (Mencegah Gambar Raksasa)
-  container.className = 'lookbook-grid';
-
-  const matchedLooks = Object.values(allLooks).filter(look => {
-    const matchTitle = (look.title || '').toLowerCase().includes(query);
-    const matchId = (look.id || '').toLowerCase().includes(query);
-    const matchCol = (look.collection_id || '').toLowerCase().includes(query);
-
-    const matchProduct = (look.product_slugs || []).some(slug => {
-      const prod = allCatalog[slug];
-      return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
-    });
-
-    return matchTitle || matchId || matchCol || matchProduct;
-  });
-
-  const matchedCatalog = Object.entries(allCatalog).filter(([slug, item]) => {
-    const matchTitle = (item.title || '').toLowerCase().includes(query);
-    const matchSubCat = (item.category || '').toLowerCase().includes(query);
-    const matchSlug = slug.toLowerCase().includes(query);
-    const matchId = (item.id || '').toLowerCase().includes(query);
-    return matchTitle || matchSubCat || matchSlug || matchId;
-  });
-
-  if (matchedLooks.length === 0 && matchedCatalog.length === 0) {
-    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Tidak ada hasil untuk "${query}".</div>`;
-    triggerGridAnimation(container);
-    return;
-  }
-
-  let html = '';
-
-  // Render Hasil Look
-  matchedLooks.forEach(look => {
-    const itemCount = (look.product_slugs || []).length;
-    const lookCode = formatCode(look.id || '');
-    const lookTitle = cleanTitle(look.title, lookCode);
-
-    html += `
-      <div class="lookbook-card" onclick="openLookDetailModal('${look.id}')" style="cursor:pointer;">
-        <div class="img-container">
-          <img src="${look.hero_image}" alt="${look.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <span style="position:absolute; top:8px; right:8px; background:#0f172a; color:#fff; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">LOOK</span>
-          <div class="overlay-info">
-            <span class="overlay-code">${lookCode}</span>
-            <span class="overlay-action">Lihat ${itemCount} Style Items ↗</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <span class="product-title">${lookTitle}</span>
-          <span class="category-tag">${itemCount} Items</span>
-        </div>
-      </div>
-    `;
-  });
-
-  // Render Hasil Individual Catalog Item
-  matchedCatalog.forEach(([slug, item]) => {
-    const itemCode = formatCode(item.id || slug);
-    const itemTitle = cleanTitle(item.title, itemCode);
-
-    html += `
-      <a href="${item.affiliate_url}" class="lookbook-card" target="_blank" rel="noopener noreferrer">
-        <div class="img-container">
-          <img src="${item.image}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x533?text=No+Image'">
-          <span style="position:absolute; top:8px; right:8px; background:#e2e8f0; color:#1e293b; font-size:10px; font-weight:700; padding:3px 6px; border-radius:4px; z-index:2;">ITEM</span>
-          <div class="overlay-info">
-            <span class="overlay-code">${itemCode}</span>
-            <span class="overlay-action">Klik untuk beli di Shopee ↗</span>
-          </div>
-        </div>
-        <div class="card-bottom">
-          <span class="product-title">${itemTitle}</span>
-          <span class="category-tag">${item.category || item.segment || 'Item'}</span>
-        </div>
-      </a>
-    `;
-  });
-
-  container.innerHTML = html;
-
-  // FIX 2: TRIGGER ANIMASI SOFT FADE-IN
-  triggerGridAnimation(container);
-}
-
-// 5. MODAL DETAIL LOOK
+// 5. MODAL DETAIL LOOK (FIXED SCROLL & CLOSE BUTTON)
 function openLookDetailModal(lookId) {
   const look = findLookById(lookId);
 
@@ -469,7 +370,9 @@ function openLookDetailModal(lookId) {
   
   if (!modal || !body) return;
 
+  // Kunci scroll halaman belakang secara ketat
   document.body.classList.add('no-scroll');
+  document.body.style.overflow = 'hidden';
 
   const attachedProducts = (look.product_slugs || [])
     .map(slug => allCatalog[slug])
@@ -478,21 +381,24 @@ function openLookDetailModal(lookId) {
   const lookCode = formatCode(look.id || '');
   const lookTitle = cleanTitle(look.title, lookCode);
 
+  // Render HTML Modal beserta Tombol Close (X)
   body.innerHTML = `
-    <div style="position: relative; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0;">
-      <h2 style="font-family:'Cormorant Garamond', serif; font-size: 24px; margin: 0 40px 6px 0; color:#0f172a; line-height: 1.2;">${lookTitle}</h2>
+    <button class="modal-close" onclick="closeDetailModal()" aria-label="Tutup Modal" style="position: absolute; top: 12px; right: 12px; background: #f1f5f9; border: none; font-size: 20px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; color: #475569;">&times;</button>
+    
+    <div style="position: relative; padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
+      <h2 style="font-family:'Cormorant Garamond', serif; font-size: 22px; margin: 0 36px 6px 0; color:#0f172a; line-height: 1.2;">${lookTitle}</h2>
       
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
         <span style="font-size: 12px; color: #64748b; font-weight: 500;">ID Style: ${lookCode}</span>
         
-        <button onclick="shareLookLink('${look.id}', '${lookTitle}')" class="btn-share-native" style="display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #cbd5e0; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: 500; color: #334155;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <button onclick="shareLookLink('${look.id}', '${lookTitle}')" class="btn-share-native" style="display: inline-flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #cbd5e0; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; cursor: pointer; font-weight: 500; color: #334155;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           Bagikan
         </button>
       </div>
     </div>
 
-    <div class="modal-body-scrollable" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-height: 75vh; overflow-y: auto; padding-bottom: 40px;">
+    <div class="modal-body-scrollable" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
       <div style="position: relative;">
         <img src="${look.hero_image}" alt="${lookTitle}" style="width:100%; border-radius:8px; object-fit:cover; display:block;">
         <div id="mobile-hint-scroll" class="mobile-scroll-floating-hint">
@@ -501,20 +407,20 @@ function openLookDetailModal(lookId) {
       </div>
 
       <div>
-        <h4 style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 12px;">Items in this look:</h4>
-        <div style="display: flex; flex-direction: column; gap: 12px;">
+        <h4 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 10px;">Items in this look:</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
           ${attachedProducts.length === 0 ? '<p style="font-size:12px; color:#94a3b8;">Belum ada item terhubung.</p>' : ''}
           ${attachedProducts.map(prod => {
             const pCode = formatCode(prod.id || '');
             const pTitle = cleanTitle(prod.title, pCode);
             return `
-              <div style="display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid #f1f5f9; border-radius: 8px; background: #fff;">
-                <img src="${prod.image}" alt="${pTitle}" style="width: 50px; height: 65px; object-fit: cover; border-radius: 6px;">
-                <div style="flex: 1;">
-                  <strong style="display: block; font-size: 13px; color: #0f172a;">${pCode} -${pTitle}</strong>
-                  <span style="font-size: 11px; color: #64748b; text-transform: capitalize;">${prod.segment || 'tops'}</span>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #f1f5f9; border-radius: 8px; background: #fff;">
+                <img src="${prod.image}" alt="${pTitle}" style="width: 48px; height: 60px; object-fit: cover; border-radius: 4px;">
+                <div style="flex: 1; min-width: 0;">
+                  <strong style="display: block; font-size: 12.5px; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pCode} -${pTitle}</strong>
+                  <span style="font-size: 10.5px; color: #64748b; text-transform: capitalize;">${prod.segment || 'tops'}</span>
                 </div>
-                <a href="${prod.affiliate_url}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; padding: 7px 14px; background: #0f172a; color: #fff; text-decoration: none; border-radius: 6px; white-space: nowrap; font-weight: 500;">
+                <a href="${prod.affiliate_url}" target="_blank" rel="noopener noreferrer" style="font-size: 11px; padding: 6px 12px; background: #0f172a; color: #fff; text-decoration: none; border-radius: 6px; white-space: nowrap; font-weight: 500;">
                   Shopee ↗
                 </a>
               </div>
@@ -527,12 +433,12 @@ function openLookDetailModal(lookId) {
 
   modal.classList.add('active');
 
-  // Hanya update URL jika saat ini tidak berada di URL spesifik look tersebut
+  // Update URL tanpa memicu navigasi ulang
   if (window.location.pathname !== `/look/${look.id}`) {
-    window.history.pushState({}, '', `/look/${look.id}`);
+    window.history.pushState({ modalOpen: true }, '', `/look/${look.id}`);
   }
 
-  const scrollableContainer = body.querySelector('.modal-body-scrollable');
+  const scrollableContainer = modal.querySelector('.modal-container');
   const hintEl = body.querySelector('#mobile-hint-scroll');
   if (scrollableContainer && hintEl) {
     scrollableContainer.addEventListener('scroll', () => {
@@ -544,10 +450,14 @@ function openLookDetailModal(lookId) {
   }
 }
 
+// FUNGSI CLOSE MODAL
 function closeDetailModal() {
   const modal = document.getElementById('detail-modal');
   if (modal) modal.classList.remove('active');
+  
+  // Kembalikan scroll body
   document.body.classList.remove('no-scroll');
+  document.body.style.overflow = '';
 
   if (window.location.pathname !== '/') {
     window.history.pushState({}, '', '/');
@@ -583,11 +493,20 @@ function checkDirectUrlLook() {
   }
 }
 
-// Setup Event Listeners Setelah DOM Terisi
+// Setup Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+  // Tutup modal jika klik di area backdrop hitam luar
   window.addEventListener('click', (e) => {
     const modal = document.getElementById('detail-modal');
     if (e.target === modal) closeDetailModal();
+  });
+
+  // Handler Tombol Back Browser di HP
+  window.addEventListener('popstate', () => {
+    const modal = document.getElementById('detail-modal');
+    if (modal && modal.classList.contains('active')) {
+      closeDetailModal();
+    }
   });
 
   document.addEventListener('click', (e) => {

@@ -471,14 +471,16 @@ main {
   50% { transform: translate(-50%, -6px); }
 }
 
+/* ==========================================================================
+   RESPONSIVE & MODAL (FIXED)
+   ========================================================================== */
+
 /* Mengunci total scroll pada body saat modal terbuka */
 body.no-scroll {
   overflow: hidden !important;
   height: 100vh !important;
   touch-action: none; /* Mencegah gestur scroll di layar mobile */
 }
-
-/* Pastikan styling modal di style.css utama seperti ini */
 
 .modal-backdrop {
   display: none; /* Sembunyi secara default */
@@ -487,10 +489,12 @@ body.no-scroll {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6); /* Latar transparan gelap */
-  z-index: 9999; /* Agar melayang paling atas */
+  background-color: rgba(0, 0, 0, 0.65); /* Latar transparan gelap */
+  z-index: 9999;
   align-items: center;
   justify-content: center;
+  padding: 16px; /* Memberikan ruang aman agar modal tidak menempel/terpotong di ujung layar */
+  box-sizing: border-box;
 }
 
 /* Saat modal aktif/terbuka */
@@ -500,13 +504,16 @@ body.no-scroll {
 
 .modal-container {
   background: #ffffff;
-  padding: 24px;
+  padding: 20px;
   border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 480px;
+  width: 100%;
+  max-height: 82vh; /* Mengurangi tinggi maks agar muat dengan URL bar browser mobile */
+  overflow-y: auto; /* Scroll hanya di dalam modal */
+  overscroll-behavior: contain; /* PENTING: Mencegah scroll membocor/merambat ke halaman belakang */
+  -webkit-overflow-scrolling: touch; /* Scroll halus di iOS */
   position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 /* ==========================================================================
@@ -658,7 +665,7 @@ body.no-scroll {
   right: -12px;
 }
 
-/* Responsif Mobile */
+/* Responsif Mobile untuk Slider */
 @media (max-width: 768px) {
   .collections-section-list .scroll-hint {
     display: none;
@@ -679,10 +686,11 @@ body.no-scroll {
     right: -4px;
   }
 
+  /* Mengubah ukuran kartu horizontal slider di mobile agar proporsional */
   .collections-section-list .horizontal-slider .lookbook-card {
-    flex: 0 0 170px;
-    width: 170px;
-    max-width: 170px;
+    flex: 0 0 150px !important;
+    width: 150px !important;
+    max-width: 150px !important;
   }
 }
 
