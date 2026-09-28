@@ -7,22 +7,12 @@ var currentViewMode = typeof currentViewMode !== 'undefined' ? currentViewMode :
 var currentSegment = typeof currentSegment !== 'undefined' ? currentSegment : 'all';
 var currentCollection = typeof currentCollection !== 'undefined' ? currentCollection : 'all';
 
+// Track HTML sebelumnya untuk mencegah re-trigger animasi yang sama
+var lastRenderedHTML = '';
+
 // Element DOM Getter Helper
 function getSearchInput() { return document.getElementById('search-input'); }
 function getHero() { return document.querySelector('.hero-section'); }
-
-// Helper 0: Debounce untuk menunda eksekusi saat mengetik di Search Bar
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
 
 // Helper 1: Membersihkan Judul dari Kode Ganda
 function cleanTitle(title, code) {
@@ -101,6 +91,8 @@ function switchViewMode(mode) {
     if (catNav) catNav.style.display = 'flex';
   }
 
+  // Force trigger animasi saat pindah mode/tab
+  lastRenderedHTML = '';
   applyFilterAndRender();
 }
 
@@ -126,6 +118,7 @@ function renderCollectionsBar() {
 function selectCollection(colId) {
   currentCollection = colId;
   renderCollectionsBar();
+  lastRenderedHTML = '';
   applyFilterAndRender();
 }
 
@@ -147,6 +140,22 @@ function applyFilterAndRender() {
   }
 }
 
+// Helper khusus untuk memutakhirkan DOM & Animasi hanya jika konten berubah
+function updateGridContent(container, newHTML) {
+  if (container.innerHTML === newHTML) return; // Jika isi sama persis, tidak usah di-render ulang/animasi ulang
+  
+  container.innerHTML = newHTML;
+  
+  // Picu animasi hanya jika konten memang berganti
+  if (lastRenderedHTML !== newHTML) {
+    container.classList.remove('fade-in-content');
+    requestAnimationFrame(() => {
+      container.classList.add('fade-in-content');
+    });
+    lastRenderedHTML = newHTML;
+  }
+}
+
 // Helper khusus untuk menangani pencarian khusus di tab Curated Looks
 function renderLooksSearch(query) {
   const container = document.getElementById('grid-container');
@@ -159,30 +168,20 @@ function renderLooksSearch(query) {
     const matchId = (look.id || '').toLowerCase().includes(query);
     const matchCol = (look.collection_id || '').toLowerCase().includes(query);
 
-    // Hanya cari di ID, Title, dan Collection Look
     return matchTitle || matchId || matchCol;
   });
 
   if (matchedLooks.length === 0) {
-    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Tidak ada Look yang cocok dengan "${query}".</div>`;
-    triggerGridAnimation(container);
+    updateGridContent(container, `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Tidak ada Look yang cocok dengan "${query}".</div>`);
     return;
   }
 
-  container.innerHTML = matchedLooks.map(look => renderLookCardHTML(look)).join('');
-  triggerGridAnimation(container);
-}
-
-// Helper Animasi Mulus & Soft
-function triggerGridAnimation(container) {
-  container.classList.remove('fade-in-content');
-  requestAnimationFrame(() => {
-    container.classList.add('fade-in-content');
-  });
+  const html = matchedLooks.map(look => renderLookCardHTML(look)).join('');
+  updateGridContent(container, html);
 }
 
 // Render Grid / Slider Curated Looks
-function renderLooksGrid(query = '') {
+function renderLooksGrid() {
   const container = document.getElementById('grid-container');
   if (!container) return;
 
@@ -193,14 +192,13 @@ function renderLooksGrid(query = '') {
 
     if (looksList.length === 0) {
       container.className = 'lookbook-grid';
-      container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Belum ada Curated Look di koleksi ini.</div>`;
-      triggerGridAnimation(container);
+      updateGridContent(container, `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">Belum ada Curated Look di koleksi ini.</div>`);
       return;
     }
 
     container.className = 'lookbook-grid';
-    container.innerHTML = looksList.map(look => renderLookCardHTML(look)).join('');
-    triggerGridAnimation(container);
+    const html = looksList.map(look => renderLookCardHTML(look)).join('');
+    updateGridContent(container, html);
     return;
   }
 
@@ -209,8 +207,7 @@ function renderLooksGrid(query = '') {
   const collectionsList = Object.values(allCollections);
 
   if (collectionsList.length === 0 && looksList.length === 0) {
-    container.innerHTML = `<div style="text-align:center; padding:40px; color:#888;">Belum ada Curated Look yang sesuai.</div>`;
-    triggerGridAnimation(container);
+    updateGridContent(container, `<div style="text-align:center; padding:40px; color:#888;">Belum ada Curated Look yang sesuai.</div>`);
     return;
   }
 
@@ -273,8 +270,7 @@ function renderLooksGrid(query = '') {
     `;
   }
 
-  container.innerHTML = html;
-  triggerGridAnimation(container);
+  updateGridContent(container, html);
 }
 
 // Fungsi Helper Scroll Horizontal
@@ -336,12 +332,11 @@ function renderCatalogGrid(query = '') {
 
   if (itemsList.length === 0) {
     const msg = query ? `Tidak ada item yang cocok dengan "${query}"` : 'Belum ada produk yang cocok.';
-    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">${msg}</div>`;
-    triggerGridAnimation(container);
+    updateGridContent(container, `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#888;">${msg}</div>`);
     return;
   }
 
-  container.innerHTML = itemsList.map(([slug, item]) => {
+  const html = itemsList.map(([slug, item]) => {
     const itemCode = formatCode(item.id || slug);
     const itemTitle = cleanTitle(item.title, itemCode);
 
@@ -362,7 +357,7 @@ function renderCatalogGrid(query = '') {
     `;
   }).join('');
 
-  triggerGridAnimation(container);
+  updateGridContent(container, html);
 }
 
 // 5. MODAL DETAIL LOOK (FIXED SCROLL & CLOSE BUTTON)
@@ -529,14 +524,15 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.cat-pill').forEach((b) => b.classList.remove('active'));
       e.currentTarget.classList.add('active');
       currentSegment = e.currentTarget.dataset.segment;
+      lastRenderedHTML = '';
       applyFilterAndRender();
     });
   });
 
   const searchInput = getSearchInput();
   if (searchInput) {
-    // Dibungkus debounce 250ms agar tidak berkedip setiap ketikan
-    const handleSearch = debounce((e) => {
+    // LANGSUNG REALTIME (0ms delay) - Tanpa Debounce!
+    searchInput.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase().trim();
       const hero = getHero();
 
@@ -555,9 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       applyFilterAndRender();
-    }, 250);
-
-    searchInput.addEventListener('input', handleSearch);
+    });
   }
 
   // Jalankan Inisialisasi Utama
