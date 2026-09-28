@@ -88,7 +88,6 @@ function switchViewMode(mode) {
     if (catNav) catNav.style.display = 'flex';
   }
 
-  // Izinkan animasi saat berganti view mode
   lastRenderedHTML = '';
   applyFilterAndRender(true);
 }
@@ -137,20 +136,24 @@ function applyFilterAndRender(allowAnimation = true) {
   }
 }
 
-// Helper khusus untuk memutakhirkan DOM & Mengatur Animasi
+// Helper Khusus Mengatur Transisi Tanpa Flash
 function updateGridContent(container, newHTML, allowAnimation = true) {
   if (container.innerHTML === newHTML) return;
-  
-  container.innerHTML = newHTML;
-  
-  // Jika allowAnimation false (misal saat mengetik), JANGAN picu animasi fade-in agar tidak kedip
+
   if (allowAnimation && lastRenderedHTML !== newHTML) {
+    // Matikan animasi sementara sebelum isi diperbarui
     container.classList.remove('fade-in-content');
+    
+    // Ganti isi DOM
+    container.innerHTML = newHTML;
+    
+    // Jalankan pergeseran halus setelah DOM siap
     requestAnimationFrame(() => {
       container.classList.add('fade-in-content');
     });
   } else {
     container.classList.remove('fade-in-content');
+    container.innerHTML = newHTML;
   }
 
   lastRenderedHTML = newHTML;
@@ -273,7 +276,7 @@ function renderLooksGrid(allowAnimation = true) {
   updateGridContent(container, html, allowAnimation);
 }
 
-// Fungsi Scroll Horizontal Mulus saat Panah Diklik
+// Fungsi Scroll Horizontal Mulus
 function scrollSlider(collectionId, distance) {
   const slider = document.getElementById(`slider-${collectionId}`);
   if (slider) {
@@ -540,7 +543,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // FALSE = Matikan animasi fade-in saat mengetik agar tidak flickering/berkedip
       applyFilterAndRender(false);
     });
   }
