@@ -245,6 +245,7 @@ main {
 }
 
 /* Konsistensi Jalur Navigasi / Sub Category Pill */
+.collections-chip-bar,
 .category-nav {
   display: flex;
   align-items: center;
@@ -254,14 +255,15 @@ main {
   padding: 0 0 4px 0;
   overflow-x: auto;
   white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 
+.collections-chip-bar::-webkit-scrollbar,
 .category-nav::-webkit-scrollbar {
   display: none;
 }
 
+.col-chip,
 .cat-pill {
   background: transparent;
   border: 1px solid transparent;
@@ -271,15 +273,11 @@ main {
   padding: 6px 14px;
   border-radius: 20px;
   cursor: pointer;
-  letter-spacing: 0.3px;
+  white-space: nowrap;
   transition: all 0.2s ease;
-  user-select: none;
 }
 
-.cat-pill:hover {
-  color: var(--text-main);
-}
-
+.col-chip.active,
 .cat-pill.active {
   background: #ffffff;
   color: var(--text-main);

@@ -141,13 +141,9 @@ function updateGridContent(container, newHTML, allowAnimation = true) {
   if (container.innerHTML === newHTML) return;
 
   if (allowAnimation && lastRenderedHTML !== newHTML) {
-    // Matikan animasi sementara sebelum isi diperbarui
     container.classList.remove('fade-in-content');
-    
-    // Ganti isi DOM
     container.innerHTML = newHTML;
     
-    // Jalankan pergeseran halus setelah DOM siap
     requestAnimationFrame(() => {
       container.classList.add('fade-in-content');
     });
@@ -280,13 +276,12 @@ function renderLooksGrid(allowAnimation = true) {
 function scrollSlider(collectionId, distance) {
   const slider = document.getElementById(`slider-${collectionId}`);
   if (slider) {
-    // Menghitung lebar 1 kartu + gap agar geser presisi sesuai jumlah kartu
     const firstCard = slider.querySelector('.lookbook-card');
     const scrollAmount = firstCard ? (firstCard.offsetWidth + 16) * 2 : distance;
 
     slider.scrollBy({
       left: distance > 0 ? scrollAmount : -scrollAmount,
-      behavior: 'smooth' // Menjamin pergeseran meluncur dengan animasi mulus
+      behavior: 'smooth'
     });
   }
 }
@@ -373,7 +368,6 @@ function renderCatalogGrid(query = '', allowAnimation = true) {
 // 5. MODAL DETAIL LOOK
 function openLookDetailModal(lookId) {
   const look = findLookById(lookId);
-
   if (!look) return;
 
   const modal = document.getElementById('detail-modal');
