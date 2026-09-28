@@ -11,6 +11,19 @@ var currentCollection = typeof currentCollection !== 'undefined' ? currentCollec
 function getSearchInput() { return document.getElementById('search-input'); }
 function getHero() { return document.querySelector('.hero-section'); }
 
+// Helper 0: Debounce untuk menunda eksekusi saat mengetik di Search Bar
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
 // Helper 1: Membersihkan Judul dari Kode Ganda
 function cleanTitle(title, code) {
   if (!title) return '';
@@ -522,7 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const searchInput = getSearchInput();
   if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
+    // Dibungkus debounce 250ms agar tidak berkedip setiap ketikan
+    const handleSearch = debounce((e) => {
       const query = e.target.value.toLowerCase().trim();
       const hero = getHero();
 
@@ -541,7 +555,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       applyFilterAndRender();
-    });
+    }, 250);
+
+    searchInput.addEventListener('input', handleSearch);
   }
 
   // Jalankan Inisialisasi Utama
