@@ -276,11 +276,18 @@ function renderLooksGrid(allowAnimation = true) {
   updateGridContent(container, html, allowAnimation);
 }
 
-// Fungsi Scroll Horizontal Mulus
+// Fungsi Scroll Horizontal Mulus & Presisi
 function scrollSlider(collectionId, distance) {
   const slider = document.getElementById(`slider-${collectionId}`);
   if (slider) {
-    slider.scrollBy({ left: distance, behavior: 'smooth' });
+    // Menghitung lebar 1 kartu + gap agar geser presisi sesuai jumlah kartu
+    const firstCard = slider.querySelector('.lookbook-card');
+    const scrollAmount = firstCard ? (firstCard.offsetWidth + 16) * 2 : distance;
+
+    slider.scrollBy({
+      left: distance > 0 ? scrollAmount : -scrollAmount,
+      behavior: 'smooth' // Menjamin pergeseran meluncur dengan animasi mulus
+    });
   }
 }
 

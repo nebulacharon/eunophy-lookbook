@@ -726,16 +726,17 @@ body.no-scroll {
   max-width: 240px;
 }
 
-/* Smooth Scroll untuk Slider Horizontal All Collections */
+/* Slider Container & Smooth Scroll */
 .horizontal-slider {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  scroll-behavior: smooth;
+  scroll-behavior: smooth; /* KUNCI utama agar bergeser meluncur mulus */
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
 }
 
+/* Sembunyikan scrollbar agar tampilan tetap bersih */
 .horizontal-slider::-webkit-scrollbar {
   display: none;
 }
@@ -744,19 +745,30 @@ body.no-scroll {
   scrollbar-width: none;
 }
 
-/* Transisi Anggun (Tanpa Flash Putih) */
-.fade-in-content {
-  animation: elegantTransition 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
+/* Interaktivitas & Animasi Tombol Panah */
+.slider-arrow {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.2s ease, 
+              box-shadow 0.2s ease;
+  cursor: pointer;
+  user-select: none;
 }
 
-@keyframes elegantTransition {
-  from {
-    opacity: 0.85; /* Tidak pernah menyentuh transparan/putih transparan */
-    transform: translateY(4px); /* Efek terangkat lembut dari bawah */
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Efek saat tombol panah di-hover */
+.slider-arrow:hover {
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.slider-arrow.arrow-left:hover {
+  transform: translateY(-50%) scale(1.08) translateX(-2px); /* Bergeser sedikit ke kiri saat ditekan/hover */
+}
+
+.slider-arrow.arrow-right:hover {
+  transform: translateY(-50%) scale(1.08) translateX(2px); /* Bergeser sedikit ke kanan saat ditekan/hover */
+}
+
+/* Efek membal saat panah diklik (Active state) */
+.slider-arrow:active {
+  transform: translateY(-50%) scale(0.95) !important;
 }
