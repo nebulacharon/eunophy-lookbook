@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* ==========================================================================
+   1. VARIABLES & RESET
+   ========================================================================== */
+
 :root {
   --bg-color: #faf9f6;
   --card-bg: #ffffff;
@@ -7,6 +11,7 @@
   --text-muted: #737373;
   --border-color: #e5e5e5;
   --accent: #000000;
+  --container-max-width: 1040px;
 }
 
 * {
@@ -30,8 +35,15 @@ body {
   position: relative;
 }
 
+/* Mengunci scroll body saat modal aktif */
+body.no-scroll {
+  overflow: hidden !important;
+  height: 100vh !important;
+  touch-action: none;
+}
+
 /* ==========================================================================
-   HEADER FREEZE / STICKY
+   2. HEADER & SEARCH BAR
    ========================================================================== */
 
 header {
@@ -47,7 +59,7 @@ header {
 }
 
 .header-container {
-  max-width: 1040px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -78,7 +90,7 @@ header {
   border-radius: 4px;
   font-size: 12.5px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s ease;
 }
 
 .search-input:focus {
@@ -96,7 +108,7 @@ header {
 }
 
 /* ==========================================================================
-   HERO SECTION
+   3. HERO SECTION & PETAL PARTICLES
    ========================================================================== */
 
 .hero-section {
@@ -114,7 +126,7 @@ header {
 }
 
 .hero-wrapper {
-  max-width: 1040px;
+  max-width: var(--container-max-width);
   height: 380px;
   margin: 0 auto;
   position: relative;
@@ -175,10 +187,6 @@ header {
   100% { transform: translateY(0px) rotate(0deg); }
 }
 
-/* ==========================================================================
-   PARTIKEL KELOPAK BUNGA
-   ========================================================================== */
-
 .petals-container {
   position: absolute;
   inset: 0;
@@ -227,23 +235,25 @@ header {
 .petal.p-front-6 { top: -20px; right: 70%; width: 7px; height: 11px; animation: floatDiagonal 9s linear infinite; animation-delay: 5s; }
 
 /* ==========================================================================
-   MAIN AREA & KATEGORI
+   4. MAIN CONTAINER & KATEGORI PILL (STANDARISASI FLEX/GRID)
    ========================================================================== */
 
 main {
-  max-width: 1040px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
   padding: 0 16px 48px 16px;
 }
 
+/* Konsistensi Jalur Navigasi / Sub Category Pill */
 .category-nav {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 0;
   margin-bottom: 24px;
+  padding: 0 0 4px 0;
   overflow-x: auto;
   white-space: nowrap;
-  padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -278,13 +288,14 @@ main {
 }
 
 /* ==========================================================================
-   PRODUCT GRID & CARDS
+   5. VERTICAL PRODUCT GRID & CARDS
    ========================================================================== */
 
 .lookbook-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -335,7 +346,6 @@ main {
   object-fit: cover;
 }
 
-/* Overlay Gradasi Halus Tanpa Patahan / Kotak */
 .overlay-info {
   position: absolute;
   bottom: 0;
@@ -352,13 +362,12 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 12px 12px 10px 12px;
+  padding: 12px;
   color: #ffffff;
   z-index: 2;
   pointer-events: none;
 }
 
-/* Kode Produk: Font Sans-Serif Tegas */
 .overlay-info .overlay-code {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   font-weight: 700 !important;
@@ -376,7 +385,6 @@ main {
   margin-top: 2px;
 }
 
-/* Footer Kartu Bawah Gambar */
 .card-bottom {
   padding: 8px 10px;
   display: flex;
@@ -387,7 +395,6 @@ main {
   gap: 8px;
 }
 
-/* Nama Produk: Font Serif Garamond */
 .product-title {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 14px;
@@ -408,119 +415,9 @@ main {
 }
 
 /* ==========================================================================
-   RESPONSIVE & MODAL
+   6. HORIZONTAL SLIDER & ANIMASI SCROLL (CURATED LOOKS)
    ========================================================================== */
 
-@media (max-width: 768px) {
-  .hero-section {
-    max-height: 320px;
-    margin-bottom: 20px;
-  }
-
-  .hero-wrapper {
-    height: 290px;
-    padding: 0 16px;
-  }
-
-  .hero-content {
-    margin-left: 20px;
-    max-width: 210px;
-  }
-
-  .hero-title {
-    font-size: 24px;
-    line-height: 1.22;
-  }
-
-  .hero-floating-art {
-    right: 4px;
-    bottom: 12px;
-    height: 82%;
-    max-height: 240px;
-  }
-}
-
-.mobile-scroll-floating-hint {
-  display: none;
-}
-
-@media (max-width: 640px) {
-  .mobile-scroll-floating-hint {
-    display: block;
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(15, 23, 42, 0.85);
-    color: #ffffff;
-    font-size: 11px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    white-space: nowrap;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: opacity 0.3s ease;
-    animation: floatBounce 2s infinite;
-    pointer-events: none;
-    z-index: 10;
-  }
-}
-
-@keyframes floatBounce {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -6px); }
-}
-
-/* ==========================================================================
-   RESPONSIVE & MODAL (FIXED)
-   ========================================================================== */
-
-/* Mengunci total scroll pada body saat modal terbuka */
-body.no-scroll {
-  overflow: hidden !important;
-  height: 100vh !important;
-  touch-action: none; /* Mencegah gestur scroll di layar mobile */
-}
-
-.modal-backdrop {
-  display: none; /* Sembunyi secara default */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.65); /* Latar transparan gelap */
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  padding: 16px; /* Memberikan ruang aman agar modal tidak menempel/terpotong di ujung layar */
-  box-sizing: border-box;
-}
-
-/* Saat modal aktif/terbuka */
-.modal-backdrop.active {
-  display: flex !important;
-}
-
-.modal-container {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 480px;
-  width: 100%;
-  max-height: 82vh; /* Mengurangi tinggi maks agar muat dengan URL bar browser mobile */
-  overflow-y: auto; /* Scroll hanya di dalam modal */
-  overscroll-behavior: contain; /* PENTING: Mencegah scroll membocor/merambat ke halaman belakang */
-  -webkit-overflow-scrolling: touch; /* Scroll halus di iOS */
-  position: relative;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-/* ==========================================================================
-   HORIZONTAL SLIDER & STREAMING SITE LAYOUT (KHUSUS CURATED LOOKS)
-   ========================================================================== */
-
-/* Container Utama Kumpulan Koleksi */
 .collections-section-list {
   display: flex;
   flex-direction: column;
@@ -528,7 +425,6 @@ body.no-scroll {
   width: 100%;
 }
 
-/* Row per 1 Koleksi */
 .collections-section-list .collection-row {
   display: flex;
   flex-direction: column;
@@ -536,7 +432,6 @@ body.no-scroll {
   width: 100%;
 }
 
-/* Header Judul Koleksi & Tombol Lihat Semua */
 .collections-section-list .collection-row-header {
   display: flex;
   justify-content: space-between;
@@ -580,50 +475,36 @@ body.no-scroll {
   color: var(--accent);
 }
 
-/* Wrapper Pembungkus Slider & Floating Arrows */
-.collections-section-list .slider-wrapper {
+.slider-wrapper {
   position: relative;
   width: 100%;
 }
 
-/* CONTINUITY BARIS KARTU (Hanya berlaku di Curated Looks / collections-section-list) */
-.collections-section-list .horizontal-slider {
+/* KUNCI PERBAIKAN SLIDER HORIZONTAL: Smooth Scroll & Padding */
+.horizontal-slider {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 4px 0 12px 0;
+  scroll-behavior: smooth !important;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  padding: 4px 0 12px 0;
+  scrollbar-width: none; /* Sembunyi secara default untuk keseragaman UI */
+  -ms-overflow-style: none;
 }
 
-.collections-section-list .horizontal-slider::-webkit-scrollbar {
-  height: 6px;
+.horizontal-slider::-webkit-scrollbar {
+  display: none;
 }
 
-.collections-section-list .horizontal-slider::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.collections-section-list .horizontal-slider::-webkit-scrollbar-thumb {
-  background-color: #e2e8f0;
-  border-radius: 10px;
-}
-
-.collections-section-list .horizontal-slider::-webkit-scrollbar-thumb:hover {
-  background-color: #cbd5e1;
-}
-
-/* Kunci ukuran kartu HANYA jika berada di dalam horizontal-slider */
-.collections-section-list .horizontal-slider .lookbook-card {
+/* Ukuran Kartu Khusus di Dalam Slider Horizontal */
+.horizontal-slider .lookbook-card {
   flex: 0 0 220px;
   width: 220px;
   max-width: 220px;
 }
 
-/* Tombol Panah Floating Navigasi */
-.collections-section-list .slider-arrow {
+/* Tombol Panah Floating Navigasi Slider */
+.slider-arrow {
   position: absolute;
   top: 45%;
   transform: translateY(-50%);
@@ -640,71 +521,55 @@ body.no-scroll {
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(4px);
-  transition: all 0.25s ease;
   opacity: 0;
   pointer-events: none;
+  user-select: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease,
+              opacity 0.25s ease,
+              box-shadow 0.2s ease;
 }
 
-.collections-section-list .slider-wrapper:hover .slider-arrow {
+.slider-wrapper:hover .slider-arrow {
   opacity: 1;
   pointer-events: auto;
 }
 
-.collections-section-list .slider-arrow:hover {
-  background: #ffffff;
+.slider-arrow:hover {
+  background-color: #ffffff;
   color: var(--accent);
-  transform: translateY(-50%) scale(1.08);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
-.collections-section-list .slider-arrow.arrow-left {
+.slider-arrow.arrow-left {
   left: -12px;
 }
 
-.collections-section-list .slider-arrow.arrow-right {
+.slider-arrow.arrow-right {
   right: -12px;
 }
 
-/* Responsif Mobile untuk Slider */
-@media (max-width: 768px) {
-  .collections-section-list .scroll-hint {
-    display: none;
-  }
-
-  .collections-section-list .slider-arrow {
-    opacity: 0.85;
-    pointer-events: auto;
-    width: 32px;
-    height: 32px;
-  }
-  
-  .collections-section-list .slider-arrow.arrow-left {
-    left: -4px;
-  }
-
-  .collections-section-list .slider-arrow.arrow-right {
-    right: -4px;
-  }
-
-  /* Mengubah ukuran kartu horizontal slider di mobile agar proporsional */
-  .collections-section-list .horizontal-slider .lookbook-card {
-    flex: 0 0 150px !important;
-    width: 150px !important;
-    max-width: 150px !important;
-  }
+.slider-arrow.arrow-left:hover {
+  transform: translateY(-50%) scale(1.08) translateX(-2px);
 }
 
+.slider-arrow.arrow-right:hover {
+  transform: translateY(-50%) scale(1.08) translateX(2px);
+}
+
+.slider-arrow:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
 
 /* ==========================================================================
-   EUNOPHY FEMININE & SOFT TRANSITION
+   7. ANIMASI TRANSISI HALUS (FADE IN) & MODAL
    ========================================================================== */
 
-/* Keyframe animasi transisi yang lembut & subtle */
 @keyframes softFeminineFade {
   0% {
     opacity: 0;
     transform: translateY(6px) scale(0.995);
-    filter: blur(2px); /* Memberikan efek kelembutan ekstra saat berpindah */
+    filter: blur(2px);
   }
   100% {
     opacity: 1;
@@ -713,62 +578,130 @@ body.no-scroll {
   }
 }
 
-/* Class pembungkus animasi halus */
 .fade-in-content {
   animation: softFeminineFade 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   will-change: opacity, transform, filter;
 }
 
-/* Menyelaraskan ukuran kartu slider agar tidak melompat */
-.collections-section-list .horizontal-slider .lookbook-card {
-  flex: 0 0 240px;
-  width: 240px;
-  max-width: 240px;
+/* Modal UI */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-/* Slider Container & Smooth Scroll */
-.horizontal-slider {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-behavior: smooth; /* KUNCI utama agar bergeser meluncur mulus */
+.modal-backdrop.active {
+  display: flex !important;
+}
+
+.modal-container {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 82vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 12px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
-/* Sembunyikan scrollbar agar tampilan tetap bersih */
-.horizontal-slider::-webkit-scrollbar {
+/* ==========================================================================
+   8. MEDIA QUERIES (RESPONSIF MOBILE)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .hero-section {
+    max-height: 320px;
+    margin-bottom: 20px;
+  }
+
+  .hero-wrapper {
+    height: 290px;
+    padding: 0 16px;
+  }
+
+  .hero-content {
+    margin-left: 20px;
+    max-width: 210px;
+  }
+
+  .hero-title {
+    font-size: 24px;
+    line-height: 1.22;
+  }
+
+  .hero-floating-art {
+    right: 4px;
+    bottom: 12px;
+    height: 82%;
+    max-height: 240px;
+  }
+
+  .collections-section-list .scroll-hint {
+    display: none;
+  }
+
+  .slider-arrow {
+    opacity: 0.85;
+    pointer-events: auto;
+    width: 32px;
+    height: 32px;
+  }
+
+  .slider-arrow.arrow-left {
+    left: -4px;
+  }
+
+  .slider-arrow.arrow-right {
+    right: -4px;
+  }
+
+  .horizontal-slider .lookbook-card {
+    flex: 0 0 150px !important;
+    width: 150px !important;
+    max-width: 150px !important;
+  }
+}
+
+.mobile-scroll-floating-hint {
   display: none;
 }
-.horizontal-slider {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+@media (max-width: 640px) {
+  .mobile-scroll-floating-hint {
+    display: block;
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.85);
+    color: #ffffff;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: opacity 0.3s ease;
+    animation: floatBounce 2s infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
 }
 
-/* Interaktivitas & Animasi Tombol Panah */
-.slider-arrow {
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
-              background-color 0.2s ease, 
-              box-shadow 0.2s ease;
-  cursor: pointer;
-  user-select: none;
-}
-
-/* Efek saat tombol panah di-hover */
-.slider-arrow:hover {
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.slider-arrow.arrow-left:hover {
-  transform: translateY(-50%) scale(1.08) translateX(-2px); /* Bergeser sedikit ke kiri saat ditekan/hover */
-}
-
-.slider-arrow.arrow-right:hover {
-  transform: translateY(-50%) scale(1.08) translateX(2px); /* Bergeser sedikit ke kanan saat ditekan/hover */
-}
-
-/* Efek membal saat panah diklik (Active state) */
-.slider-arrow:active {
-  transform: translateY(-50%) scale(0.95) !important;
+@keyframes floatBounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -6px); }
 }
