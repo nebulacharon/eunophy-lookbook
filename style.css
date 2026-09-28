@@ -725,3 +725,37 @@ body.no-scroll {
   width: 240px;
   max-width: 240px;
 }
+
+
+/* Smooth Scroll untuk Slider Horizontal All Collections */
+.horizontal-slider {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-behavior: smooth; /* Membuat gerakan panah kiri/kanan mulus */
+  -webkit-overflow-scrolling: touch; /* Smooth momentum scroll di iOS / HP */
+  padding-bottom: 8px;
+}
+
+/* Sembunyikan scrollbar bawaan agar rapi */
+.horizontal-slider::-webkit-scrollbar {
+  display: none;
+}
+.horizontal-slider {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Transisi Halus Konten Grid (Hanya Fade In Lembut Tanpa Flicker/Kaget) */
+.fade-in-content {
+  animation: gentleFadeIn 0.25s ease-out forwards;
+}
+
+@keyframes gentleFadeIn {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
