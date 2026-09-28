@@ -4,16 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eunophy — Lookbook & Curations</title>
+
+  <link rel="icon" type="image/png" href="assets/images/eunophy.png">
   
   <!-- Font Serif Editorial -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
   
-  <!-- GUNAKAN ABSOLUTE PATH /style.css -->
+  <!-- EXTERNAL CSS MAIN -->
   <link rel="stylesheet" href="/style.css">
+
   <style>
-    /* Styling Tambahan Khusus Elemen Sistem Baru */
+    /* Styling Tambahan Khusus Elemen Switch & Modal */
     .view-mode-tabs {
       display: flex;
       justify-content: center;
@@ -35,33 +38,6 @@
       color: #0f172a;
       border-color: #0f172a;
       font-weight: 600;
-    }
-
-    /* Collections Chip Bar Horizontal Scroll */
-    .collections-chip-bar {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 10px 16px;
-      margin-bottom: 15px;
-      scrollbar-width: none;
-    }
-    .collections-chip-bar::-webkit-scrollbar { display: none; }
-    .col-chip {
-      white-space: nowrap;
-      padding: 6px 16px;
-      border-radius: 20px;
-      border: 1px solid #e2e8f0;
-      background: #ffffff;
-      font-size: 12px;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .col-chip.active {
-      background: #0f172a;
-      color: #ffffff;
-      border-color: #0f172a;
     }
 
     /* Modal Styling diselaraskan dengan app.js & Cloudflare Function */
@@ -137,7 +113,7 @@
         <h1 class="hero-title">Wear what makes you<br>feel like yourself</h1>
       </div>
 
-      <!-- Floating Character Art (GUNAKAN ABSOLUTE PATH /assets/...) -->
+      <!-- Floating Character Art -->
       <img src="/assets/images/hero-floating.png" class="hero-floating-art" alt="Eunophy editorial illustration" loading="eager" onerror="this.style.display='none'">
 
       <!-- Layer Depan -->
@@ -196,7 +172,6 @@
     </div>
   </div>
 
-  <!-- GUNAKAN ABSOLUTE PATH /app.js -->
   <script src="/app.js"></script>
 </body>
 </html>
