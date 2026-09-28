@@ -146,12 +146,8 @@ function renderLooksSearch(query) {
     const matchId = (look.id || '').toLowerCase().includes(query);
     const matchCol = (look.collection_id || '').toLowerCase().includes(query);
 
-    const matchProduct = (look.product_slugs || []).some(slug => {
-      const prod = allCatalog[slug];
-      return prod && ((prod.title || '').toLowerCase().includes(query) || slug.toLowerCase().includes(query));
-    });
-
-    return matchTitle || matchId || matchCol || matchProduct;
+    // Hanya cari di ID, Title, dan Collection Look
+    return matchTitle || matchId || matchCol;
   });
 
   if (matchedLooks.length === 0) {
