@@ -338,22 +338,30 @@ main {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
 }
 
-.img-container {
-  position: relative;
-  width: 100%;
-  padding-top: 133.33%;
-  background: #f4f4f4;
-  overflow: hidden;
-}
+/* ==========================================================================
+   5. KUNCI UKURAN GAMBAR (CEGAH FLASH GAMBAR BESAR)
+   ========================================================================== */
 
-.img-container img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+   .img-container {
+    position: relative;
+    width: 100%;
+    padding-top: 133.33%; /* Aspect ratio 3:4 */
+    background: #f4f4f4;
+    overflow: hidden !important; /* Paksa gambar tidak bisa keluar garis */
+    contain: strict; /* Mengunci layout browser agar tidak berantakan saat gambar dimuat */
+  }
+  
+  .img-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover;
+    display: block;
+  }
 
 .overlay-info {
   position: absolute;
@@ -571,25 +579,24 @@ main {
    7. ANIMASI TRANSISI HALUS TAB / GRID (SMOOTH, NO FLASH) & MODAL
    ========================================================================== */
 
-#grid-container {
-  will-change: opacity, transform;
-}
-
-.grid-transition-enter,
-.fade-in-content {
-  animation: smoothSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes smoothSlideUp {
-  0% {
-    opacity: 0.3;
-    transform: translateY(10px) scale(0.995);
+   #grid-container {
+    will-change: opacity;
   }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  
+  /* Animasi instan & cepat tanpa pergeseran posisi ekstrem */
+  .grid-transition-enter,
+  .fade-in-content {
+    animation: fastFadeIn 0.2s ease-out forwards;
   }
-}
+  
+  @keyframes fastFadeIn {
+    from {
+      opacity: 0.6; /* Dimulai dari 0.6 agar mulus dan instan tanpa kilatan putih */
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
 /* Modal UI */
 .modal-backdrop {
