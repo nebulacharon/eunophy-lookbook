@@ -32,7 +32,7 @@ function formatCode(rawCode) {
   return cleaned;
 }
 
-// Helper 3: Mencari Look Tanpa Terpengaruh Huruf Besar/Kecil (Case-Insensitive)
+// Helper 3: Mencari Look Tanpa Terpengaruh Huruf Besar/Kecil
 function findLookById(targetId) {
   if (!targetId || !allLooks) return null;
   const cleanTarget = targetId.trim().toLowerCase();
@@ -136,34 +136,31 @@ function applyFilterAndRender(allowAnimation = true) {
   }
 }
 
-// Helper Khusus Mengatur Transisi Mulus Tanpa Flash
+// HELPER BARU: Mengatur Transisi Instan Tanpa Delay, Flash, atau Gambar Besar
 function updateGridContent(container, newHTML, allowAnimation = true) {
-  // Jika konten tidak berubah, batalkan re-render
   if (container.innerHTML === newHTML) return;
 
-  if (allowAnimation) {
-    // 1. Meredupkan konten sebentar (0.1 detik) sebelum DOM diganti
-    container.style.opacity = '0.4';
+  // Kunci tinggi kontainer saat ini agar halaman tidak meloncat saat mengganti isi DOM
+  const currentHeight = container.offsetHeight;
+  if (currentHeight > 0) {
+    container.style.minHeight = `${currentHeight}px`;
+  }
 
-    setTimeout(() => {
-      // 2. Ganti konten DOM saat opacity dalam kondisi redup
-      container.innerHTML = newHTML;
-      
-      // 3. Reset style inline
-      container.style.opacity = '';
-      
-      // 4. Jalankan animasi slide-up yang halus
-      container.classList.remove('grid-transition-enter');
-      
-      // Trik reflow browser agar animasi ter-trigger ulang dengan mulus
-      void container.offsetWidth; 
-      
-      container.classList.add('grid-transition-enter');
-    }, 100); // Delay singkat 100ms untuk menghilangkan efek 'flash'
+  // Ganti HTML secara langsung tanpa setTimeout
+  container.innerHTML = newHTML;
+
+  if (allowAnimation) {
+    container.classList.remove('grid-transition-enter');
+    void container.offsetWidth; // Trigger reflow browser
+    container.classList.add('grid-transition-enter');
   } else {
     container.classList.remove('grid-transition-enter');
-    container.innerHTML = newHTML;
   }
+
+  // Lepaskan kunci tinggi kontainer di frame berikutnya
+  requestAnimationFrame(() => {
+    container.style.minHeight = '';
+  });
 
   lastRenderedHTML = newHTML;
 }
